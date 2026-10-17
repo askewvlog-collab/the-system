@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<!-- The System | Fitness Tracker. Copyright (C) 2026 ASKEW. GPL-3.0-or-later, see LICENSE. -->
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The System | Fitness Tracker</title>
+<meta name="description" content="The System | Fitness Tracker: an offline fitness quest game. No accounts, no network.">
+<meta name="theme-color" content="#030207">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%23030207%22/%3E%3Cpath%20d%3D%22M14%209h36v46H14z%22%20fill%3D%22none%22%20stroke%3D%22%23a07bff%22%20stroke-width%3D%223%22/%3E%3Cpath%20d%3D%22M32%209v46%22%20stroke%3D%22%235cc8ff%22%20stroke-width%3D%222.5%22/%3E%3Cpath%20d%3D%22M14%209l18%2012M50%209L32%2021M14%2055l18-12M50%2055L32%2043%22%20fill%3D%22none%22%20stroke%3D%22%23a07bff%22%20stroke-width%3D%222%22%20opacity%3D%22.7%22/%3E%3Cpath%20d%3D%22M8%204v8M4%208h8M56%2060v-8M60%2056h-8%22%20stroke%3D%22%235cc8ff%22%20stroke-width%3D%222%22/%3E%3C/svg%3E">
+<style>
+:root{--bg:#030207;--pan:#0a0818d9;--ln:#5cc8ff;--mu:#8f93bd;--tx:#e6eaff;--vi:#a07bff;--rd:#ff4a3d;--ye:#ffd23d;--ok:#3ddc97;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:radial-gradient(60% 40% at 12% 8%,#5b2bd655,transparent 70%),radial-gradient(50% 35% at 92% 42%,#7c3aed40,transparent 70%),radial-gradient(70% 40% at 28% 96%,#4c1d9570,transparent 70%),#030207;background-attachment:fixed;color:var(--tx);font:15px/1.45 "Segoe UI",system-ui,sans-serif;max-width:520px;margin:auto;padding:14px 12px 84px;min-height:100vh}
+.w{position:relative;background:var(--pan);border:1px solid #8a6bff66;padding:14px;margin:12px 0;box-shadow:inset 0 0 24px #7c3aed18,0 0 20px #7c3aed26}
+.w:before,.w:after{content:"";position:absolute;width:12px;height:12px;border:2px solid var(--ln)}
+.w:before{top:-2px;left:-2px;border-right:0;border-bottom:0}.w:after{bottom:-2px;right:-2px;border-left:0;border-top:0}
+.w.r{border-color:#ff4a3d99;box-shadow:inset 0 0 24px #ff4a3d22,0 0 22px #ff4a3d30}.w.r:before,.w.r:after{border-color:var(--rd)}
+.w.v{border-color:#8a6bffaa}.w.v:before,.w.v:after{border-color:var(--vi)}
+h2{font-size:15px;font-weight:600;margin:0 0 4px;color:var(--ln);letter-spacing:.5px}
+.rk{font-size:46px;font-weight:700;line-height:1;color:#d6c6ff;text-shadow:0 0 18px #7c3aedcc,0 0 8px #5cc8ff88}
+.mu{color:var(--mu);font-size:13px}.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.bar{height:6px;background:#1a1436;margin:8px 0 4px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#7c3aed,#5cc8ff);box-shadow:0 0 8px #7c3aed;transition:width .7s ease}
+button,input,textarea{font:inherit;color:var(--tx);background:#120f2b;border:1px solid #8a6bff66;padding:9px 12px;border-radius:0}
+button{cursor:pointer}button:focus-visible,input:focus-visible{outline:2px solid var(--ye);outline-offset:2px}button.go{background:linear-gradient(135deg,#3a1d9a,#14487f);border-color:#8fb6ff}button:disabled{opacity:.4}
+.q{display:block;width:100%;text-align:left;margin:8px 0 0;padding:12px}.q.sel{background:linear-gradient(135deg,#2c1a78,#12386a);border-color:#9fc4ff;box-shadow:0 0 12px #7c3aed77}
+.q b{display:block;font-size:16px}.xp{color:var(--ye)}
+input{width:100%}textarea{width:100%;height:110px;font-size:12px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:#05030cf2;border-top:1px solid #8a6bff55;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;background:none;color:var(--mu);padding:15px 4px}nav button.on{color:var(--ln);box-shadow:inset 0 2px 0 var(--ln)}
+.sec{display:none}.sec.on{display:block}
+#ov{position:fixed;inset:0;background:radial-gradient(circle at 50% 38%,#5b2bd65c,#000000f5 68%);display:none;align-items:center;justify-content:center;text-align:center;z-index:9;padding:20px}
+#ov.on{display:flex}#ov .rk{font-size:80px}
+#ov.glitch .rk,#ov.glitch p{animation:gl .15s steps(2) infinite;text-shadow:3px 0 #ff2d6f,-3px 0 #00f0ff}@keyframes gl{0%{transform:translate(0)}25%{transform:translate(-6px,2px) skewX(10deg)}50%{transform:translate(5px,-3px)}75%{transform:translate(-3px,3px) skewX(-8deg)}100%{transform:translate(4px,0)}}
+.sl{background:#10306a;color:#fff;border:1px solid #4fb8ff88;padding:9px 12px;border-radius:0;font:inherit;cursor:pointer}.sl option{background:#0c1a33;color:#fff}
+#ts{position:fixed;left:50%;bottom:calc(64px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);max-width:90%;background:#0a1428;border:1px solid var(--ln);padding:10px 14px;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;z-index:30;box-shadow:0 0 16px #4fb8ff55;text-align:center}#ts.on{opacity:1;transform:translate(-50%,0)}
+#wh{position:fixed;inset:0;background:radial-gradient(circle at 50% 38%,#2a1466f2,#000000fa 68%);display:none;align-items:center;justify-content:center;text-align:center;z-index:9;padding:20px}#wh.on{display:flex}
+.wheel{position:relative;width:240px;height:240px;border-radius:50%;border:2px solid var(--ln);margin:0 auto 16px;box-shadow:0 0 24px #4fb8ff55}.wheel span{position:absolute;left:50%;top:50%;width:44px;margin:-10px 0 0 -22px;text-align:center;font-weight:600;color:#fff}.wp{color:var(--ye);font-size:26px;line-height:1;margin-bottom:-8px;position:relative;z-index:1}
+.key{display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:50%}
+.bolt{position:fixed;z-index:20;font-size:34px;pointer-events:none;filter:drop-shadow(0 0 10px #4fb8ff) drop-shadow(0 0 20px #fff)}
+.tp{margin-top:12px}.tp .g{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:6px 0}
+.tp .g button{padding:8px 0;background:#10306a;color:#fff;text-align:center;border-color:#4fb8ff88}.tp .g button:hover{background:#1a4a96}.tp .g button.on{background:#2a7fe8;border-color:#fff;box-shadow:0 0 10px #4fb8ff}
+.sec.enter .w{animation:in .4s ease both}@keyframes in{from{opacity:0;transform:translateY(10px)}}
+@media (prefers-reduced-motion:reduce){.sec.enter .w{animation:none}}
+#pn{position:fixed;inset:0;z-index:15;display:none;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 50% 38%,#2a1466f2,#000000fa 70%)}#pn.on{display:flex}#pn .w{max-width:420px;width:100%}#pn p{line-height:1.5}
+/* Animated flame/electric border, colored by key rank via --c. Used on gates and special gates. */
+@property --a{syntax:"<angle>";initial-value:0deg;inherits:false}
+.w.flame{--c:#a07bff;border:2px solid transparent;border-color:transparent;background:linear-gradient(#0a0818,#0a0818) padding-box,conic-gradient(from var(--a),transparent 0 50%,var(--c) 72%,#fff 78%,var(--c) 84%,transparent 100%) border-box;box-shadow:0 0 18px color-mix(in srgb,var(--c) 45%,transparent);animation:orbit 3.2s linear infinite,flick 1.3s ease-in-out infinite alternate}
+.w.flame:before,.w.flame:after{border-color:var(--c)}
+@keyframes orbit{to{--a:360deg}}
+@keyframes flick{0%{box-shadow:0 0 10px color-mix(in srgb,var(--c) 35%,transparent)}35%{box-shadow:0 0 26px color-mix(in srgb,var(--c) 60%,transparent)}70%{box-shadow:0 0 14px color-mix(in srgb,var(--c) 40%,transparent)}100%{box-shadow:0 0 30px color-mix(in srgb,var(--c) 65%,transparent)}}
+@media (prefers-reduced-motion:reduce){.w.flame{animation:none}}
+.kr{border-left:3px solid var(--c);padding-left:8px}
+.ib{width:26px;height:26px;padding:0;border-radius:50%;font-size:14px;font-style:italic;font-family:serif;line-height:1;color:var(--ln);border-color:var(--ln);flex:none}
+.qr{display:flex;gap:8px;align-items:stretch;margin-top:8px}.qr .q{margin:0;flex:1}.qr .ib{align-self:center}
+#ex{position:fixed;inset:0;z-index:12;display:none;background:#000000e8;overflow:auto;padding:16px}#ex.on{display:block}
+#ex .w{max-width:560px;margin:0 auto}
+.exf{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}.exf figure{margin:0;text-align:center}
+.exf svg{width:100%;height:auto;background:#0a0818;border:1px solid #8a6bff44}
+.exf .fl{stroke:#5b4a99;stroke-width:1;fill:none}.exf .ln{stroke:var(--ln);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;fill:none}.exf .hd{fill:none;stroke:var(--vi);stroke-width:2}
+.exc ul{margin:4px 0 8px;padding-left:20px}.exc{margin-bottom:14px}.exc h2{font-size:17px}
+#tut{position:fixed;inset:0;z-index:14;display:none;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 50% 38%,#2a1466f2,#000000fa 70%)}#tut.on{display:flex}
+#tut .w{max-width:420px;width:100%}#tut p{font-size:15px;line-height:1.5}
+.kr{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}.kc{width:auto;flex:1;min-width:120px;font-size:12px;padding:6px 8px}
+#fxw{position:fixed;inset:0;z-index:16;display:none;background:#000;cursor:pointer}#fxw.on{display:block}
+#fx{width:100%;height:100%;display:block}#fxs{position:absolute;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));text-align:center;opacity:.6;pointer-events:none}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cols .w{margin:12px 0;padding:10px;min-width:0}.cols .q{padding:8px;font-size:13px}.cols .q b{font-size:14px}.cols h2{font-size:14px}
+</style></head><body>
+<div class="w"><div class="row"><div><div class="mu">Player rank</div><div class="rk" id="rk"></div></div><div style="text-align:right"><div id="xt" class="mu"></div><div id="sk" class="mu"></div><div id="sr" class="mu" style="color:var(--ye)"></div></div></div><div class="bar"><i id="xb"></i></div></div>
+
+<div id="today" class="sec on"></div>
+<div id="gate" class="sec"></div>
+<div id="sum" class="sec"></div>
+<div id="set" class="sec"></div>
+<nav id="nv"></nav>
+<div id="wh"><div><div class="mu">Spin for your bonus</div><div class="wp">▼</div><div class="wheel" id="wl"></div><div id="wo" class="mu" style="max-width:320px;margin:0 auto 10px"></div><p id="wr" class="xp" style="font-size:18px;min-height:27px"></p><button class="go" id="wb">Spin</button></div></div>
+<div id="ex" role="dialog" aria-modal="true" aria-label="Exercise info"><div class="w"><div id="exb"></div><button id="exx" class="go" onclick="hideEx()">Close</button></div></div>
+<div id="tut" role="dialog" aria-modal="true" aria-labelledby="tt"><div class="w"><div class="mu" id="tc"></div><h2 id="tt"></h2><p id="tm"></p><div class="row"><button onclick="tutEnd()">Skip</button><button class="go" id="tn" onclick="tutNext()">Next</button></div></div></div>
+<div id="pn" role="dialog" aria-modal="true" aria-labelledby="pnt"><div class="w v"><h2 id="pnt">Absence detected</h2><p id="pnm"></p><div class="row"><button onclick="pendResolve(false)">Lose XP, keep token</button><button class="go" onclick="pendResolve(true)">Spend token</button></div></div></div>
+<div id="fxw" aria-hidden="true"><canvas id="fx"></canvas><div id="fxs" class="mu">Tap to skip</div></div>
+<div id="ov"><div><div class="mu" id="ot"></div><div class="rk" id="or"></div><p id="om"></p><button class="go" onclick="ov.classList.remove('on')">Continue</button></div></div>
+<script>
+const LOGO="<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect width=\"64\" height=\"64\" fill=\"#030207\"/><path d=\"M14 9h36v46H14z\" fill=\"none\" stroke=\"#a07bff\" stroke-width=\"3\"/><path d=\"M32 9v46\" stroke=\"#5cc8ff\" stroke-width=\"2.5\"/><path d=\"M14 9l18 12M50 9L32 21M14 55l18-12M50 55L32 43\" fill=\"none\" stroke=\"#a07bff\" stroke-width=\"2\" opacity=\".7\"/><path d=\"M8 4v8M4 8h8M56 60v-8M60 56h-8\" stroke=\"#5cc8ff\" stroke-width=\"2\"/></svg>";
+// State, save/load, dates, seeded random.
+const $=id=>document.getElementById(id);
+const def=()=>({v:SAVE_VERSION,xp:0,fl:0,chk:null,days:{},gates:{},hist:{},keys:[],stars:[],win:{s:"17:00",e:"19:00"}});
+let S; // loaded at boot (main.js) once every module is defined
+const SAVE_KEY=window.__SAVEKEY||"gate1"; // the dev build uses its own key so it never touches a real save
+const save=()=>{try{localStorage.setItem(SAVE_KEY,JSON.stringify(S))}catch(e){}};
+const ds=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)};
+const now=()=>new Date(Date.now()+((S.off||0)*864e5)); // S.off only exists in automated tests (time travel)
+const today=()=>ds(now());const nowMs=()=>now().getTime();
+const hash=s=>{let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0}return h};
+function rnd(seed){let a=hash(seed);return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function weekId(d=now()){const x=new Date(d);const k=(x.getDay()+6)%7;x.setDate(x.getDate()-k);return ds(x)}
+// Save format, migrations, validation. A bad import or corrupt save never replaces a good one.
+// v1 = original build. v2 = adds the rank floor (fl). v3 = adds weekly summary records (hist). v4 = adds special keys, pending penalty choice. v5 = adds prestige stars. Add one MIGRATIONS step per version bump,
+// and add every new state field to sanitize() or it is dropped on load/import.
+const SAVE_VERSION=5;
+const MIGRATIONS={1:o=>({...o,fl:0,v:2}),2:o=>({...o,hist:{},v:3}),3:o=>({...o,keys:[],v:4}),4:o=>({...o,stars:[],v:5})};
+const DATE=/^\d{4}-\d\d-\d\d$/,HM=/^([01]\d|2[0-3]):[0-5]\d$/;
+const isObj=x=>!!x&&typeof x==="object"&&!Array.isArray(x);
+const num=(x,lo,hi,d)=>typeof x==="number"&&isFinite(x)?Math.min(hi,Math.max(lo,x)):d;
+const int=(x,lo,hi,d)=>Number.isInteger(x)&&x>=lo&&x<=hi?x:d;
+function cleanGate(g){
+  if(!isObj(g))return null;
+  const o={p:int(g.p,0,3,0),kr:int(g.kr,0,6,0),start:g.start==null?null:num(g.start,0,1e15,null),prog:num(g.prog,0,1e6,0),done:g.done===true,coop:g.coop===true,paid:g.paid===true};
+  if(g.pp!=null)o.pp=num(g.pp,0,9999,0);if(g.end!=null)o.end=num(g.end,0,1e15,undefined);if(g.bx!=null)o.bx=num(g.bx,0,1e6,undefined);
+  return o;
+}
+function sanitize(o){
+  const s=def();s.xp=num(o.xp,0,1e7,0);s.fl=int(o.fl,0,5,0);s.chk=DATE.test(o.chk)?o.chk:null;
+  if(isObj(o.days))for(const k of Object.keys(o.days)){const e=o.days[k];if(DATE.test(k)&&isObj(e)){const d={};
+    if(e.p!=null)d.p=int(e.p,0,2,undefined);if(e.p2!=null)d.p2=int(e.p2,0,2,undefined);for(const f of["done","hb","h","rest","sg","c2","done2"])if(e[f]===true)d[f]=true;s.days[k]=d}}
+  if(isObj(o.gates))for(const k of Object.keys(o.gates)){const g=cleanGate(o.gates[k]);if(DATE.test(k)&&g)s.gates[k]=g}
+  const c=cleanGate(o.co);if(c&&DATE.test(o.co.w)){c.w=o.co.w;s.co=c}
+  if(isObj(o.win)){if(HM.test(o.win.s))s.win.s=o.win.s;if(HM.test(o.win.e))s.win.e=o.win.e;s.win.len=int(o.win.len,1,2,2)}
+  if(isObj(o.hist))for(const k of Object.keys(o.hist)){const r=o.hist[k];if(DATE.test(k)&&isObj(r))s.hist[k]={c:int(r.c,0,7,0),xp:num(r.xp,0,1e7,0),xl:num(r.xl,0,1e7,0),v:num(r.v,0,1e7,0),st:int(r.st,0,1e5,0),g:int(r.g,0,2,0),bp:[0,1,2,3].map(i=>int(Array.isArray(r.bp)?r.bp[i]:0,0,1e4,0))}}
+  if(isObj(o.pend)&&typeof o.pend.n==='number'&&isFinite(o.pend.n))s.pend={n:num(o.pend.n,0,1e4,0),m:int(o.pend.m,1,1e4,1)};
+  if(Array.isArray(o.keys))for(const k of o.keys.slice(0,20)){if(isObj(k)){const r=int(k.r,0,6,-1),sd=int(k.s,0,36**6-1,-1);if(r>=0&&sd>=0&&!s.keys.some(x=>x.r===r&&x.s===sd))s.keys.push({id:keyCode({r,s:sd}),r,s:sd})}}
+  if(isObj(o.sg)){const g=o.sg,r=int(g.r,0,6,-1),sd=int(g.s,0,36**6-1,-1);
+    if(r>=0&&sd>=0&&Array.isArray(g.ex)&&g.ex.length===3&&g.ex.every(x=>EX[x])&&Array.isArray(g.t)&&Array.isArray(g.p))
+      s.sg={id:keyCode({r,s:sd}),r,s:sd,start:num(g.start,0,1e15,0),end:num(g.end,0,1e15,0),ex:g.ex.slice(),t:[0,1,2].map(i=>int(g.t[i],1,9999,1)),p:[0,1,2].map(i=>int(g.p[i],0,9999,0)),run:g.run===true,done:g.done===true,bx:num(g.bx,0,1e6,0)}}
+  if(Array.isArray(o.stars))s.stars=o.stars.slice(0,99).filter(isObj).map(x=>({plus:x.plus===true}));
+  s.tok=int(o.tok,0,2,0);s.att=int(o.att,0,3,0);
+  if(o.rem===0||o.rem===1)s.rem=o.rem;
+  for(const f of["plus","sec","tut"])if(o[f]===true)s[f]=true;
+  if(typeof o.jm==="string")s.jm=o.jm.slice(0,200);
+  return s;
+}
+// Text -> clean current-version state, or throws Error with a short reason.
+function parseSave(text){
+  let o;try{o=JSON.parse(text)}catch(e){throw new Error("Not valid data")}
+  if(!isObj(o))throw new Error("Not a save");
+  if(typeof o.xp!=="number"||!isFinite(o.xp)||o.xp<0)throw new Error("No valid XP");
+  let v=o.v===undefined?1:o.v;
+  if(!Number.isInteger(v)||v<1)throw new Error("Unknown version");
+  if(v>SAVE_VERSION)throw new Error("Save is from a newer version");
+  while(v<SAVE_VERSION){o=MIGRATIONS[v](o);v=o.v}
+  return sanitize(o);
+}
+const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+// Keep the current save under a side key before anything replaces it.
+const keepPrev=()=>{const c=store.get(SAVE_KEY);if(c)store.set(SAVE_KEY+".prev",c)};
+let loadNote=null;
+function loadSave(){
+  const raw=store.get(SAVE_KEY);if(!raw)return def();
+  try{
+    const o=parseSave(raw),v=(JSON.parse(raw).v||1);
+    if(v<SAVE_VERSION&&store.get(SAVE_KEY+".v"+v)===null)store.set(SAVE_KEY+".v"+v,raw); // pre-migration copy
+    return o;
+  }catch(e){store.set(SAVE_KEY+".bad",raw);loadNote="Saved data could not be read. A copy was kept. Starting fresh.";return def()}
+}
+// Export / import of the save.
+function expJ(){$("jx").value=JSON.stringify(S);$("jx").select();try{navigator.clipboard.writeText($("jx").value)}catch(e){}toast("Data copied.")}
+function impJ(){try{const n=parseSave($("jx").value);keepPrev();S=n;raiseFloor();save();render();toast("Data imported.")}catch(e){toast("Import failed: "+(e.message||"invalid data")+". Current progress kept.")}}
+// XP, ranks, missed-day penalty.
+const R=["EE","E","D","C","B","A","S"],T=[0,30,100,250,600,1400,3000];
+const ri=()=>{let r=0;T.forEach((t,i)=>{if(S.xp>=t)r=i});return r};
+const scale=()=>1+ri()*.4;
+// Rank floors: a reached rank is a floor. Only S can fall, and only to A (index 5).
+const floorIdx=()=>Math.min(5,Math.max(S.fl||0,0));
+function raiseFloor(){const f=Math.min(5,ri());if(f>(S.fl||0))S.fl=f}
+// Remove XP without dropping below the floor. Returns the XP actually lost.
+function loseXp(n){const min=T[floorIdx()],l=Math.max(0,Math.min(n,S.xp-min));S.xp-=l;return l}
+function penalty(){
+  sgExpire();raiseFloor();const t=today();if(!S.chk){S.chk=t;save();return}
+  // One ordinary missed-day penalty per return, however long the absence.
+  let d=new Date(S.chk+"T12:00:00"),missed=0,n=0;
+  while(ds(d)<t&&n<400){if(!dayDone(ds(d))&&!(S.days[ds(d)]&&S.days[ds(d)].rest))missed++;d.setDate(d.getDate()+1);n++}
+  S.chk=t;
+  if(missed&&!S.pend){
+    const amt=2+ri()*2,loss=Math.min(amt,S.xp-T[floorIdx()]);
+    if(loss>0&&(S.tok||0)>0){S.pend={n:amt,m:missed};save();pendShow();return} // player chooses: spend a token or lose the XP
+    if(loss>0)applyPenalty(amt,missed);
+  }
+  save();
+}
+function applyPenalty(n,missed){const lost=loseXp(n);if(!lost)return;histAdd("xl",lost);save();banner("Penalty","−"+lost+" XP",missed>1?"You were absent "+missed+" days. One penalty applied.":"You missed a day. Quests cost XP when skipped.")}
+// Return after missed days with a token in hand: spend it to lose no XP, or lose the XP and keep the token.
+function pendShow(){const p=S.pend;if(!p)return;const loss=Math.max(0,Math.min(p.n,S.xp-T[floorIdx()]));$("pnm").textContent=(p.m>1?"You were absent "+p.m+" days. ":"You missed a day. ")+"One penalty applies: −"+loss+" XP. Spend a rest token (you have "+(S.tok||0)+") to lose nothing, or accept the loss and keep the token.";$("pn").classList.add("on")}
+function pendResolve(spend){const p=S.pend;if(!p)return;S.pend=null;$("pn").classList.remove("on");if(spend&&(S.tok||0)>0){S.tok--;save();toast("Rest token spent. No XP lost.")}else applyPenalty(p.n,p.m);save();render()}
+// Applies XP at once (so a closed app never loses a claimed reward). defer=true postpones the banner: call announce(result) later.
+function gain(x,defer){const b=ri();S.xp+=x;histAdd("xp",x);raiseFloor();save();const r={b,a:ri()};if(!defer)announce(r);return r}
+function announce(r){if(r.a>r.b){if(r.a==6&&!S.sec)secretSeq();else banner("Rank up","Rank "+R[r.a],"You reached rank "+R[r.a]+". Challenges are now harder.")}}
+// Single source of truth for XP amounts: shown rewards must equal awarded rewards.
+const questXp=t=>t==0?1:Math.round([1,4,10][t]*(1+ri()*.3)); // easy is always 1 XP
+const habitXp=()=>Math.round(3*(1+ri()*.3));
+// Locked in (g.bx) when the gate is entered, so a rank-up mid-gate cannot change the promised reward.
+const gateBase=kr=>{const rel=kr-ri(),m=rel>=2?2:rel==1?1.5:rel==0?1:Math.pow(.6,-rel);return Math.round(30*(1+kr)*m)};
+function gateXp(g){return g.bx||gateBase(g.kr)}
+const gatePartialXp=g=>Math.round(gateXp(g)*.7*g.prog/target(g));
+const wheelXp=(g,m)=>Math.round(gateXp(g)*m);
+// Extra XP in place of a rest token once the inventory is full (2).
+const tokenBonusXp=g=>(S.tok||0)>=2?Math.round(gateXp(g)*.25):0;
+// Daily quests, weekly habit, rest tokens, streak.
+const PT=[{n:"Legs",e:"squats",x:"squats",b:50,c:"#ffd23d"},{n:"Chest",e:"push-ups",x:"pushups",b:40,c:"#ff4a3d"},{n:"Core",e:"sit-ups",x:"situps",b:50,c:"#3ddc97"},{n:"Back",e:"back extensions",x:"back_ext",b:40,c:"#8a6bff"}];
+const TN=["Easy","Medium","Hard"];
+// Medium amounts depend on the move (EX[id].med), scaled by rank. Hard = two different exercises (second from another body part).
+function exAmt(id,r,f=1){const[lo,hi]=EX[id].med,a=Math.round((lo+Math.floor(r()*(hi-lo+1)))*scale()*f);return a>=30?Math.round(a/5)*5:a}
+function quests(date,col=0){
+  const r=rnd((col?"q2":"q")+date),ps=[0,1,2,3].sort(()=>r()-.5).slice(0,3),tiers=[0,1,2].sort(()=>r()-.5),pick1=a=>a[Math.floor(r()*a.length)];
+  return ps.map((p,i)=>{const t=tiers[i],ex=pick1(exOf(p)),o={p,t,ex,xp:questXp(t)};
+    if(t==0)o.amt=1+Math.floor(r()*2);
+    else if(t==1)o.amt=exAmt(ex,r);
+    else{const p2=pick1([0,1,2,3].filter(x=>x!=p));o.p2=p2;o.amt=exAmt(ex,r,.9);o.ex2=pick1(exOf(p2));o.amt2=exAmt(o.ex2,r,.9)}
+    return o}).sort((a,b)=>a.t-b.t);
+}
+const qLabel=q=>q.amt+" "+EX[q.ex].nm+(q.ex2?" + "+q.amt2+" "+EX[q.ex2].nm:"");
+const qParts=q=>PT[q.p].n+(q.ex2?" + "+PT[q.p2].n:"");
+// A first star (not S+) adds a second daily-quest column; when it was active that day, both must be cleared (e.c2).
+const cols=()=>S.stars.some(s=>!s.plus)?2:1;
+function dayDone(d){const e=S.days[d];return !!e&&(e.sg===true||!!(e.done&&(!e.hb||e.h)&&(!e.c2||e.done2)))}
+function weekDone(w){let n=0,d=new Date(w+"T12:00:00");for(let i=0;i<7;i++){if(dayDone(ds(d)))n++;d.setDate(d.getDate()+1)}return n}
+function pick(i,col=0){const d=today();const e=S.days[d]||(S.days[d]={});if(e[col?"done2":"done"]||e.rest)return;if(col)e.p2=i;else e.p=i;if(cols()>1)e.c2=true;save();render()}
+function finish(col=0){const d=today(),e=S.days[d],pk=col?"p2":"p",dk=col?"done2":"done";if(!e||e[pk]==null||e[dk]||e.rest)return;const q=quests(d,col)[e[pk]];e[dk]=true;if(!col)e.hb=!!habit();histClear(q);zap($(col?"fin2":"fin"));const res=gain(q.xp,true);render();setTimeout(()=>{announce(res);const M=MSG[q.t];toast(M[Math.floor(Math.random()*M.length)])},650)}
+function questPanel(col,e){
+  const pk=col?"p2":"p",dk=col?"done2":"done",qs=quests(today(),col);
+  return `<div class="w"><h2>Daily quest${col?" 2":""}</h2><div class="mu">Choose one. Harder quests pay more. Skipping a day costs XP.</div>${qs.map((q,i)=>`<div class="qr"><button class="q ${e[pk]===i?"sel":""}" onclick="pick(${i},${col})" ${e[dk]?"disabled":""}><b>${qLabel(q)}</b><span class="mu">${qParts(q)} · ${TN[q.t]} · </span><span class="xp">+${q.xp} XP</span></button>${exInfoBtn(q.ex+(q.ex2?","+q.ex2:""))}</div>`).join("")}<button id="fin${col||""}" class="go q" style="text-align:center" onclick="finish(${col})" ${e[pk]==null||e[dk]?"disabled":""}>${e[dk]?"Quest cleared":"Mark quest complete"}</button></div>`;
+}
+const dailyHtml=e=>cols()>1?`<div class="cols">${questPanel(0,e)}${questPanel(1,e)}</div>`:questPanel(0,e);
+const MSG=[["Streak held. Easy quest logged.","Easy quest logged. The streak continues.","Minimum met. Streak intact.","Logged. Showing up counts."],["I'm proud of you.","Solid work. That's the kind of effort that builds a rank.","Steady and strong. Keep this up.","Medium effort, real progress. Proud of you."],["Way to go. That was serious work.","That was hard and you did it anyway. Respect.","Beast mode. Your future self thanks you.","Outstanding. Few people push like that."]];
+// Habit for week w, built from the quests chosen in the week before it.
+function habit(w=weekId()){const pw=new Date(w+"T12:00:00");pw.setDate(pw.getDate()-7);const c=[0,0,0,0],a=[0,0,0,0],n=[0,0,0,0];for(let i=0;i<7;i++){const k=ds(pw),e=S.days[k];if(e&&e.done&&e.p!=null){const q=quests(k)[e.p];if(q){c[q.p]++;if(q.t==1&&q.ex===PT[q.p].x){a[q.p]+=q.amt;n[q.p]++}}}pw.setDate(pw.getDate()+1)}const p=c.indexOf(Math.max(...c));return c[p]>=3?{p,amt:Math.max(5,n[p]?Math.round(a[p]/n[p]):Math.round(EX[PT[p].x].med[0]*scale()))}:null}
+function habitDone(){const d=today(),e=S.days[d]||(S.days[d]={});if(e.h)return;e.h=true;histSync();zap($("hb"));const res=gain(habitXp(),true);render();setTimeout(()=>{announce(res);toast("Habit done. Consistency wins.")},650)}
+const nextWeekId=()=>ds(new Date(new Date(weekId()+"T12:00:00").getTime()+7*864e5));
+function habitHtml(e){
+  const h=habit(),P=h&&PT[h.p];
+  let out=h?`<div class="w v"><h2>Weekly habit</h2><div class="mu">You picked ${P.n} most last week. Do this every day on top of your quest. Missing either one costs the day. Reward <span class="xp">+${habitXp()} XP</span>.</div><p><b style="font-size:18px">${h.amt} ${P.e}</b> ${exInfoBtn(P.x)}</p><button id="hb" class="${e.h?"":"go"}" onclick="habitDone()" ${e.h?"disabled":""}>${e.h?"Habit done":"Mark habit complete"}</button></div>`:"";
+  if(now().getDay()===0){const n=habit(nextWeekId()),N=n&&PT[n.p];out+=`<div class="w"><h2>Next week's habit</h2><div class="mu">${n?`Preview: <b>${n.amt} ${N.e}</b> every day. Based on the quests you chose this week. Clearing another quest today may change it.`:"None yet. A body part chosen on 3 or more days becomes next week's daily habit."}</div></div>`}
+  return out}
+function restHtml(e){const t=S.tok||0;if(e.rest)return `<div class="w v"><h2>Rest day</h2><div class="mu">Streak protected. No XP lost. This day does not count toward your 5 days.</div></div>`;return `<div class="w"><h2 id="rt">Rest tokens: ${t} / 2</h2><div class="mu">Earned by clearing gates. A rest day keeps your streak and costs no XP, but does not count toward your 5 days.</div>${t>0&&!e.done?`<button style="margin-top:8px" onclick="useRest()">Use rest token</button>`:""}</div>`}
+function useRest(){const d=today(),e=S.days[d]||(S.days[d]={});if(e.done||e.rest||e.sg||!(S.tok>0))return;e.rest=true;S.tok--;save();render();toast("Rest day logged.")}
+function streak(){let n=0,d=now();if(!dayDone(today())&&!(S.days[today()]&&S.days[today()].rest))d.setDate(d.getDate()-1);while(dayDone(ds(d))||(S.days[ds(d)]&&S.days[ds(d)].rest)){if(dayDone(ds(d)))n++;d.setDate(d.getDate()-1)}return n}
+// Weekly gate, co-op, reward wheel.
+function gateFor(w){
+  const c=G(w);if(c){if(!c.start&&c.kr>ri())c.kr=ri();return c}
+  const r=rnd("g"+w),p=Math.floor(r()*4),kr=Math.max(0,ri()-Math.floor(r()*2)); // never above the player's rank
+  return S.gates[w]={p,kr,start:null,prog:0,done:false,coop:false,paid:false};
+}
+// Co-op: the player's share is half the target (target() returns the share). Cleared when own reps reach the
+// share and combined reps (own + partner's honor-system reps) reach the total. The player earns full XP.
+const target=g=>{const t=Math.round(PT[g.p].b*(1+g.kr*1.2)/10)*10;return g.coop?Math.round(t/2/5)*5:t};
+function addProg(n){const w=weekId(),g=gateFor(w);if(!g.start||g.done||nowMs()>=gEnd(g,w))return;const p0=g.prog;g.prog=Math.max(0,Math.min(target(g),g.prog+n));histAdd("v",g.prog-p0);checkClear(g);save();render()}
+const totalTarget=g=>g.coop?target(g)*2:target(g);
+const isCleared=g=>g.prog>=target(g)&&g.prog+(g.pp||0)>=totalTarget(g);
+function checkClear(g){if(!g.done&&isCleared(g)){g.done=true;histGate(weekId(),2);toast("Gate cleared. Claim your reward.")}}
+function addCustom(sign){const n=Math.floor(+$("cv").value);if(n>0)addProg(sign*Math.min(n,9999))}
+function setPartner(v){const w=weekId(),g=gateFor(w);if(!g.start||!g.coop||g.paid||nowMs()>=gEnd(g,w))return;g.pp=Math.max(0,Math.min(9999,Math.floor(+v)||0));checkClear(g);save();render()}
+function openGate(){const w=weekId(),g=gateFor(w);if(g.start||gateState(w)!=='open')return;g.bx=gateXp(g);g.start=nowMs();g.end=gateEndMs(w);save();render();gateFx("enter",g)}
+function wheelFx(w=weekId()){const g=G(w);if(!g||!g.done||g.paid)return;gateFx("clear",g,()=>wheelOpen(w))}
+function claimPartial(w=weekId()){const g=G(w);if(!g||g.paid||g.done||!g.start||nowMs()<gEnd(g,w))return;g.paid=true;histGate(w,g.prog>0?1:0);gain(gatePartialXp(g))}
+// Gate window: opens Friday 18:00 local, expires Sunday midnight (= Monday 00:00).
+const G=w=>S.co&&S.co.w===w?S.co:S.gates[w];
+function gateOpenMs(w){const d=new Date(w+"T18:00:00");d.setDate(d.getDate()+4);return d.getTime()}
+function gateEndMs(w){const d=new Date(w+"T00:00:00");d.setDate(d.getDate()+7);return d.getTime()}
+const gEnd=(g,w)=>g.end||gateEndMs(w);
+const gateEligible=()=>ri()>=2&&weekDone(weekId())>=5;
+// locked: not eligible; waiting: eligible, before Friday 18:00; open: can enter / in progress
+function gateState(w=weekId()){if(!gateEligible())return"locked";if(nowMs()<gateOpenMs(w))return"waiting";return nowMs()<gateEndMs(w)?"open":"over"}
+function fmtLeft(ms){const m=Math.max(0,Math.ceil(ms/6e4)),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?d+"d "+h+"h":h?h+"h "+m%60+"m":m+"m"}
+// Earlier-week gates that were started but never settled (reward or partial XP unclaimed).
+function unsettled(){const cw=weekId(),ws=Object.keys(S.gates);if(S.co&&!ws.includes(S.co.w))ws.push(S.co.w);return ws.filter(w=>{const g=G(w);return w<cw&&g&&g.start&&!g.paid}).sort()}
+function code(){const g=gateFor(weekId());return btoa(JSON.stringify({p:g.p,kr:g.kr}))}
+function join(){const v=$("jc").value.trim(),k=parseKey(v);if(k){S.jm=addKey(k)?"Key added: rank "+KEYRANK[k.r]+". See Special gates.":"You already hold that key.";save();render();return}try{const c=JSON.parse(atob(v));if(!(c.p>=0&&c.p<=3&&c.kr>=0&&c.kr<=6))throw 0;S.co={w:weekId(),p:c.p,kr:Math.min(c.kr,ri()),start:null,prog:0,done:false,coop:true,paid:false};S.jm="Joined: "+PT[c.p].n+" co-op gate. It appears on the Gates tab when your weekend gate is open.";save();render()}catch(e){S.jm="That code is not valid.";render()}}
+function leaveCo(){if(S.co&&S.co.start)return;S.co=null;save();render()} // only before the gate is started
+const WS=[1.5,2.2,1.6,1.5,2.0,1.7,1.5,1.8],WC=[1.8,3.0,2.0,2.2,1.8,2.8,2.0,2.5];
+// Slice weight w drives both the drawn size and the odds, so they always match. All 1 = equal slices.
+const wheelSlices=g=>(g.coop?WC:WS).map((m,i)=>i===KEY_SLOT?{m:"key",w:KEY_W}:{m,w:1});
+function wheelAngles(sl){const tot=sl.reduce((a,s)=>a+s.w,0);let a=0;return sl.map(s=>{const sz=s.w/tot*360,r={from:a,mid:a+sz/2,p:s.w/tot};a+=sz;return r})}
+function wheelOdds(sl){const o={};sl.forEach(s=>o[s.m]=(o[s.m]||0)+s.w);const tot=sl.reduce((a,s)=>a+s.w,0);return Object.keys(o).sort((a,b)=>(a=="key")-(b=="key")||a-b).map(m=>(m=="key"?"Special key ":m+"x ")+(o[m]/tot*100).toFixed(1).replace(/\.0$/,"")+"%").join(" · ")}
+let wheelW;function wheelOpen(w=weekId()){const g=G(w);if(!g||!g.done||g.paid)return;wheelW=w;const sl=wheelSlices(g),an=wheelAngles(sl);const bg=sl.map((_,k)=>(k%2?"#0b1d3a":"#123a66")+" "+an[k].from+"deg "+(k+1<sl.length?an[k+1].from:360)+"deg").join(",");const wl=$("wl");wl.style.transition="none";wl.style.transform="rotate(0deg)";wl.style.background="conic-gradient("+bg+")";wl.innerHTML=sl.map((s,k)=>`<span style="transform:rotate(${an[k].mid}deg) translateY(-92px)">${s.m=="key"?"KEY":s.m+"x"}</span>`).join("");$("wo").textContent="Base "+gateXp(g)+" XP × multiplier (the key slice pays ×1). Odds: "+wheelOdds(sl);$("wr").textContent="";$("wb").textContent="Spin";$("wb").disabled=false;$("wb").onclick=spin;$("wh").classList.add("on")}
+function spin(){const g=G(wheelW),sl=wheelSlices(g),an=wheelAngles(sl),wl=$("wl");let t=Math.random()*sl.reduce((a,s)=>a+s.w,0),i=0;while(i<sl.length-1&&t>=sl[i].w){t-=sl[i].w;i++}$("wb").disabled=true;void wl.offsetWidth;wl.style.transition="transform 4s cubic-bezier(.15,.7,.1,1)";wl.style.transform="rotate("+(1800-an[i].mid)+"deg)";setTimeout(()=>{const isKey=sl[i].m==="key",m=isKey?1:sl[i].m,base=gateXp(g),x=wheelXp(g,m),bonus=tokenBonusXp(g),key=isKey?newKey():null;if(key)addKey(key);g.paid=true;if((S.tok||0)<2)S.tok=(S.tok||0)+1;const res=gain(x+bonus,true);toast(bonus?"Tokens full. Bonus XP awarded.":"Rest token earned.");$("wr").textContent=(key?"Special key acquired: rank "+KEYRANK[key.r]+". ":"")+"Base "+base+" XP × "+m+" = "+x+" XP"+(bonus?" · tokens full: +"+bonus+" XP":"");$("wb").textContent="Close";$("wb").disabled=false;$("wb").onclick=()=>{$("wh").classList.remove("on");render();announce(res)}},4300)}
+// Special keys: rare wheel prize, permanent until used, shareable via a deterministic code.
+// Code format SK<rank 0-6>-<seed base36>: same code = same special gate (see special.js).
+const KEYRANK=["EE","E","D","C","B","A","S"];
+// Flame/electric color per key rank (EE..S).
+const KC=["#8f93bd","#5cc8ff","#3ddc97","#ffd23d","#ff8a3d","#ff4a3d","#c06bff"];
+const KEY_SLOT=4,KEY_W=.3; // one wheel slot of 8; weight .3 vs 1 for the others = about 4% odds
+const keyCode=k=>"SK"+k.r+"-"+k.s.toString(36);
+function parseKey(v){const m=/^SK([0-6])-([0-9a-z]{1,6})$/i.exec(String(v).trim());if(!m)return null;const s=parseInt(m[2].toLowerCase(),36);return s>=0&&s<36**6?{r:+m[1],s}:null}
+function addKey(k){const id=keyCode(k);if(S.keys.length>=20||S.keys.some(x=>x.id===id))return false;S.keys.push({id,r:k.r,s:k.s});return true}
+const newKey=()=>({r:Math.min(6,ri()+1),s:Math.floor(Math.random()*36**4)}); // key rank = player's rank + 1
+function keysHtml(){
+  const sg=S.sg;if(!S.keys.length&&!sg)return"";
+  const rows=S.keys.map(k=>`<div class="kr" style="--c:${KC[k.r]}"><span class="key" style="background:${KC[k.r]}"></span><b>Rank ${KEYRANK[k.r]} key</b><input class="kc" readonly value="${k.id}" onclick="this.select()" aria-label="Key code">${sg?"":`<button class="go" onclick="openSpecial('${k.id}',this)">Enter</button>`}</div>`).join("");
+  return (sg?sgHtml():"")+(S.keys.length?`<div class="w v"><h2>Special gates</h2><div class="mu">Keys are permanent until used. Share a key's code with 1 or 2 friends: the same code opens the same gate.${sg?" Finish the active special gate first.":""}</div>${rows}</div>`:"");
+}
+// Special gate: a hard compound challenge opened with a key. While active (up to 5 days) it replaces the daily
+// quests, and each day with progress counts as a cleared day. The weekly gate is unaffected.
+// Reward: big XP and a rest token. If it expires uncleared the key is returned (no penalty).
+// Result format for future friend comparison: R1:<code>:<cleared 1|0>:<days used>:<reps,reps,reps>
+const SG_DAYS=5;
+const sgActive=()=>!!S.sg&&!S.sg.done;
+const sgXp=g=>Math.round(g.bx*(g.run?1.2:1));
+function sgBuild(k){
+  const rr=rnd("sg"+keyCode(k)),parts=[0,1,2,3].sort(()=>rr()-.5).slice(0,3),gap=Math.max(0,k.r-ri());
+  const ex=parts.map(p=>{const a=exOf(p);return a[Math.floor(rr()*a.length)]});
+  const t=ex.map(id=>{const[lo,hi]=EX[id].med,a=Math.round((lo+hi)/2*(1+k.r*.15)*(1+.2*gap));return a>=30?Math.round(a/5)*5:a});
+  return{ex,t,gap}; // lower-rank players facing a higher key get larger targets by rank gap
+}
+function openSpecial(id,b){
+  const i=S.keys.findIndex(k=>k.id===id);if(i<0||S.sg)return;
+  if(!b.dataset.c){b.dataset.c="1";b.textContent="Tap again: replaces daily quests for up to 5 days";setTimeout(()=>{b.dataset.c="";b.textContent="Enter"},4000);return}
+  const k=S.keys[i],B=sgBuild(k);S.keys.splice(i,1);
+  S.sg={id:k.id,r:k.r,s:k.s,start:nowMs(),end:nowMs()+SG_DAYS*864e5,ex:B.ex,t:B.t,p:[0,0,0],run:false,done:false,bx:2*gateBase(k.r)};
+  save();render();gateFx("enter",S.sg);
+}
+function sgExpire(){const g=S.sg;if(g&&!g.done&&nowMs()>=g.end){addKey({r:g.r,s:g.s});S.sg=null;save();toast("Special gate expired. Key returned.")}}
+function sgAdd(i,n){
+  const g=S.sg;if(!g||g.done||nowMs()>=g.end)return;
+  const p0=g.p[i];g.p[i]=Math.max(0,Math.min(g.t[i],p0+n));const d=g.p[i]-p0;histAdd("v",d);
+  if(d>0){const e=S.days[today()]||(S.days[today()]={});e.sg=true;histSync()}
+  if(g.p.every((v,j)=>v>=g.t[j])){g.done=true;toast("Special gate cleared. Claim your reward.")}
+  save();render();
+}
+const sgRun=()=>{const g=S.sg;if(g&&!g.done){g.run=!g.run;save();render()}};
+const sgClaimFx=()=>{if(S.sg&&S.sg.done)gateFx("clear",S.sg,sgClaim)};
+function sgClaim(){
+  const g=S.sg;if(!g||!g.done)return;
+  const bonus=tokenBonusXp({kr:g.r,bx:g.bx});if((S.tok||0)<2)S.tok=(S.tok||0)+1;
+  S.sg=null;const res=gain(sgXp(g)+bonus,true);save();render();announce(res);
+  toast(bonus?"Tokens full. Bonus XP awarded.":"Rest token earned.");
+}
+const sgResult=g=>"R1:"+g.id+":"+(g.done?1:0)+":"+Math.min(SG_DAYS,Math.ceil((nowMs()-g.start)/864e5)||1)+":"+g.p.join(",");
+function sgHtml(){
+  const g=S.sg;if(!g)return"";
+  const left=fmtLeft(g.end-nowMs());
+  const rows=g.ex.map((id,i)=>`<div style="margin-top:10px"><b>${g.p[i]} / ${g.t[i]} ${EX[id].nm}</b> ${exInfoBtn(id)}<div class="bar"><i style="width:${g.p[i]/g.t[i]*100}%"></i></div>${g.done?"":`<div class="row" style="justify-content:flex-start">${[1,5,10].map(k=>`<button onclick="sgAdd(${i},${k})">+${k}</button>`).join("")}${[1,5].map(k=>`<button onclick="sgAdd(${i},-${k})">−${k}</button>`).join("")}</div>`}</div>`).join("");
+  return `<div class="w v flame" style="--c:${KC[g.r]}"><h2>Special gate · rank ${KEYRANK[g.r]}</h2><div class="mu">${g.done?"Cleared.":left+" left. Replaces your daily quests. Each day with progress counts as a cleared day."} Reward <span class="xp">+${sgXp(g)} XP</span> and a rest token${g.run?"":" (+20% XP with the optional run)"}. Split into sets. Stop if anything hurts.</div>${rows}${g.done?`<button class="go" style="margin-top:12px" onclick="sgClaimFx()">Claim reward</button><div class="mu" style="margin-top:8px">Result code: ${sgResult(g)}</div>`:`<button style="margin-top:12px" class="${g.run?"go":""}" onclick="sgRun()">${g.run?"Run logged (10 min)":"Optional: log a 10-minute run"}</button>`}</div>`;
+}
+// Gate entry and clear sequences. All art is original and drawn in code (canvas): no images, no copied assets.
+// Entry: gate doors part and reveal a slowly drifting scene (red hellscape, purple thunderstorm, yellow speed rush).
+// Clear: the scene collapses, shatters into shards, and one shard flies to the rest-token counter.
+// Skippable (tap or Escape) and skipped entirely under prefers-reduced-motion.
+const FXC={hell:"#ff4a3d",storm:"#a07bff",speed:"#ffd23d"};
+const fxReduced=()=>window.__noFx||matchMedia("(prefers-reduced-motion:reduce)").matches;
+const clamp01=x=>Math.max(0,Math.min(1,x)),ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+// Scene by body part for weekly gates (legs yellow, chest red, others purple); by key rank for special gates.
+const fxKind=g=>g.ex?(g.r>=5?"hell":g.r>=3?"storm":"speed"):(g.p==0?"speed":g.p==1?"hell":"storm");
+const fxLabel=g=>g.ex?"Special gate · rank "+KEYRANK[g.r]:PT[g.p].n+" gate · rank "+R[g.kr];
+
+function fxParts(kind,w,h){const r=rnd("fx"+kind),P=[];const n=kind=="storm"?90:kind=="hell"?70:70;for(let i=0;i<n;i++)P.push({a:r(),b:r(),c:r(),d:r(),e:r()});return P}
+function fxScene(ctx,w,h,t,kind,P){
+  if(kind=="hell"){
+    let g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,"#100202");g.addColorStop(.55,"#4a0b08");g.addColorStop(1,"#a3200f");ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+    g=ctx.createRadialGradient(w*.5,h*.62,0,w*.5,h*.62,h*.55);g.addColorStop(0,"rgba(255,110,40,.45)");g.addColorStop(1,"rgba(255,60,20,0)");ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+    for(let L=0;L<3;L++){ctx.fillStyle=["#2a0504","#1a0303","#0a0101"][L];ctx.beginPath();ctx.moveTo(0,h);for(let x=0;x<=w+8;x+=8){const o=t*.012*(L+1)+L*90;ctx.lineTo(x,h*(.62+L*.1)-Math.abs(Math.sin((x+o)*.011*(L+1)))*h*.12*(1+L*.3)-Math.sin((x+o)*.037)*h*.02)}ctx.lineTo(w,h);ctx.fill()}
+    P.forEach(p=>{const y=((p.b*h-t*(.02+p.c*.05))%h+h)%h,x=p.a*w+Math.sin(t*.001*(1+p.d)+p.e*6)*18,a=.25+.6*p.d;ctx.fillStyle="rgba(255,"+(110+p.e*90|0)+",50,"+a+")";ctx.beginPath();ctx.arc(x,y,1+p.c*2.2,0,7);ctx.fill()});
+  }else if(kind=="storm"){
+    let g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,"#05010f");g.addColorStop(.6,"#1b0a45");g.addColorStop(1,"#3a1a80");ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+    for(let i=0;i<7;i++){const p=P[i],x=((p.a*(w+500)+t*.012*(.5+p.c))%(w+500))-250,y=p.b*h*.55,r=h*(.18+p.d*.18);g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,"rgba(70,35,140,.6)");g.addColorStop(1,"rgba(40,15,90,0)");ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2)}
+    ctx.strokeStyle="rgba(180,160,255,.22)";ctx.lineWidth=1;ctx.beginPath();for(let i=10;i<P.length;i++){const p=P[i],x=((p.a*w-t*.08*(.6+p.c))%w+w)%w,y=((p.b*h+t*.5*(.7+p.d))%h);ctx.moveTo(x,y);ctx.lineTo(x-4,y+14)}ctx.stroke();
+    const k=Math.floor(t/800),ph=t-k*800;if(ph<140){const r2=rnd("bolt"+k);ctx.save();ctx.globalAlpha=1-ph/140;ctx.fillStyle="rgba(190,160,255,.18)";ctx.fillRect(0,0,w,h);ctx.strokeStyle="#fff";ctx.shadowColor="#b890ff";ctx.shadowBlur=22;ctx.lineWidth=2.5;ctx.beginPath();let x=w*(.2+r2()*.6),y=0;ctx.moveTo(x,y);while(y<h*.7){x+=(r2()-.5)*60;y+=20+r2()*30;ctx.lineTo(x,y)}ctx.stroke();ctx.restore()}
+  }else{
+    ctx.fillStyle="#070500";ctx.fillRect(0,0,w,h);const g=ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,Math.max(w,h)*.6);g.addColorStop(0,"rgba(255,210,61,.35)");g.addColorStop(1,"rgba(255,160,0,0)");ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+    ctx.lineCap="round";const R0=Math.hypot(w,h)/2;P.forEach(p=>{const ang=p.a*Math.PI*2,q=((t*.00045*(.6+p.c)+p.b)%1),r=q*q*R0,len=8+q*q*R0*.35;ctx.strokeStyle="rgba(255,"+(190+p.d*50|0)+",60,"+(.15+q*.8)+")";ctx.lineWidth=.6+q*2.2;ctx.beginPath();ctx.moveTo(w/2+Math.cos(ang)*r,h/2+Math.sin(ang)*r);ctx.lineTo(w/2+Math.cos(ang)*(r+len),h/2+Math.sin(ang)*(r+len));ctx.stroke()});
+  }
+}
+const ENTER_MS=3400;
+function fxEnter(ctx,w,h,t,kind,P,label){
+  const c=FXC[kind];fxScene(ctx,w,h,t,kind,P);
+  const p=ease(clamp01(t/1100));
+  if(p<1){const gw=p*w/2,L=w/2-gw;
+    ctx.fillStyle="#07050f";ctx.fillRect(0,0,L,h);ctx.fillRect(w/2+gw,0,L+1,h);
+    ctx.strokeStyle="rgba(255,255,255,.05)";ctx.lineWidth=1;for(let y=0;y<h;y+=46){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(L,y);ctx.moveTo(w/2+gw,y);ctx.lineTo(w,y);ctx.stroke()}
+    ctx.save();ctx.shadowColor=c;ctx.shadowBlur=24;ctx.fillStyle=c;ctx.fillRect(L-2,0,2,h);ctx.fillRect(w/2+gw,0,2,h);ctx.restore();
+    if(p<.02){ctx.save();ctx.shadowColor=c;ctx.shadowBlur=30;ctx.fillStyle=c;ctx.fillRect(w/2-1,0,2,h);ctx.restore()}
+  }
+  const a=clamp01((t-1300)/600)*clamp01((ENTER_MS-t)/400);
+  if(a>0){ctx.save();ctx.globalAlpha=a;ctx.textAlign="center";ctx.fillStyle="#e6eaff";ctx.shadowColor=c;ctx.shadowBlur=18;ctx.font="600 13px system-ui,sans-serif";ctx.fillText("GATE ENTERED",w/2,h*.44);ctx.font="600 26px system-ui,sans-serif";ctx.fillText(label,w/2,h*.44+38);ctx.restore()}
+}
+const CLEAR_MS=3200,COLL=900;
+function fxClearInit(w,h,kind,P,tgt){
+  const sn=document.createElement("canvas");sn.width=w;sn.height=h;const s=sn.getContext("2d");
+  s.fillStyle="#000";s.fillRect(0,0,w,h);s.save();s.translate(w/2,h/2);s.scale(.55,.55);s.translate(-w/2,-h/2);fxScene(s,w,h,5000,kind,P);s.restore();
+  const r=rnd("shard"+kind),cols=8,rows=12,pts=[];
+  for(let j=0;j<=rows;j++){pts.push([]);for(let i=0;i<=cols;i++){const edge=i==0||j==0||i==cols||j==rows;pts[j].push([i/cols*w+(edge?0:(r()-.5)*w/cols*.6),j/rows*h+(edge?0:(r()-.5)*h/rows*.6)])}}
+  const sh=[];for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const a=pts[j][i],b=pts[j][i+1],c=pts[j+1][i+1],d=pts[j+1][i];[[a,b,c],[a,c,d]].forEach(T=>{const cx=(T[0][0]+T[1][0]+T[2][0])/3,cy=(T[0][1]+T[1][1]+T[2][1])/3,dx=cx-w/2,dy=cy-h/2,m=Math.hypot(dx,dy)||1;sh.push({T,cx,cy,vx:dx/m*(120+r()*200),vy:dy/m*(120+r()*200)-60,g:380+r()*240,sp:(r()-.5)*7})})}
+  let tok=0,best=1e9;sh.forEach((s2,i)=>{const d=Math.hypot(s2.cx-w/2,s2.cy-h/2);if(d<best){best=d;tok=i}});
+  const cr=[];for(let k=0;k<9;k++){const ang=r()*7;let x=w/2,y=h/2;const seg=[[x,y]];for(let n=0;n<7;n++){x+=Math.cos(ang+(r()-.5))*h*.07;y+=Math.sin(ang+(r()-.5))*h*.07;seg.push([x,y])}cr.push(seg)}
+  return{sn,sh,tok,cr,tgt};
+}
+function fxClear(ctx,w,h,t,kind,P,st){
+  const c=FXC[kind];ctx.fillStyle="#000";ctx.fillRect(0,0,w,h);
+  if(t<COLL){const p=ease(t/COLL);ctx.save();ctx.translate(w/2+(Math.random()-.5)*8*p,h/2+(Math.random()-.5)*8*p);ctx.scale(1-.45*p,1-.45*p);ctx.translate(-w/2,-h/2);fxScene(ctx,w,h,5000+t,kind,P);ctx.restore();
+    ctx.strokeStyle="rgba(255,255,255,"+(.3+.6*p)+")";ctx.lineWidth=1.4;st.cr.forEach(seg=>{const n=Math.max(1,Math.floor(seg.length*p));ctx.beginPath();ctx.moveTo(seg[0][0],seg[0][1]);for(let i=1;i<n;i++)ctx.lineTo(seg[i][0],seg[i][1]);ctx.stroke()});return}
+  const q=clamp01((t-COLL)/(CLEAR_MS-COLL)),s=(t-COLL)/1000;
+  st.sh.forEach((o,i)=>{if(i===st.tok)return;ctx.save();ctx.globalAlpha=1-q*q;ctx.translate(o.cx+o.vx*s,o.cy+o.vy*s+o.g*s*s);ctx.rotate(o.sp*s);ctx.translate(-o.cx,-o.cy);ctx.beginPath();ctx.moveTo(o.T[0][0],o.T[0][1]);ctx.lineTo(o.T[1][0],o.T[1][1]);ctx.lineTo(o.T[2][0],o.T[2][1]);ctx.closePath();ctx.clip();ctx.drawImage(st.sn,0,0,w,h);ctx.restore()});
+  const o=st.sh[st.tok],f=ease(clamp01((q-.15)/.8)),x=o.cx+(st.tgt.x-o.cx)*f,y=o.cy+(st.tgt.y-o.cy)*f-Math.sin(f*Math.PI)*60,sz=26*(1-.6*f);
+  ctx.save();ctx.translate(x,y);ctx.rotate(f*6);ctx.shadowColor="#5cc8ff";ctx.shadowBlur=20;ctx.fillStyle="#bfe9ff";ctx.beginPath();ctx.moveTo(0,-sz);ctx.lineTo(sz*.8,sz*.6);ctx.lineTo(-sz*.8,sz*.6);ctx.closePath();ctx.fill();ctx.restore();
+  const a=clamp01((q-.2)/.25)*clamp01((1-q)/.25);if(a>0){ctx.save();ctx.globalAlpha=a;ctx.textAlign="center";ctx.fillStyle="#e6eaff";ctx.shadowColor=c;ctx.shadowBlur=18;ctx.font="600 26px system-ui,sans-serif";ctx.fillText("GATE CLEARED",w/2,h*.4);ctx.restore()}
+}
+// kind: "enter" | "clear". g: weekly gate or special gate object. done runs after the sequence (or at once when skipped / reduced motion).
+let fxBusy=false;
+function gateFx(mode,g,done){
+  if(fxReduced()||fxBusy){done&&done();return}
+  fxBusy=true;const wrap=$("fxw"),cv=$("fx"),dpr=Math.min(2,window.devicePixelRatio||1),w=innerWidth,h=innerHeight;
+  cv.width=w*dpr;cv.height=h*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+  const kind=fxKind(g),P=fxParts(kind,w,h);let st=null,t0=performance.now(),raf=0,ended=false;
+  const rt=$("rt"),tgtEl=rt&&rt.offsetParent?rt:document.querySelector("#nv button"),tr=tgtEl.getBoundingClientRect();
+  if(mode=="clear")st=fxClearInit(w,h,kind,P,{x:tr.left+tr.width/2,y:tr.top+tr.height/2});
+  const total=mode=="enter"?ENTER_MS:CLEAR_MS;
+  const end=()=>{if(ended)return;ended=true;cancelAnimationFrame(raf);wrap.classList.remove("on");removeEventListener("keydown",key);wrap.onclick=null;fxBusy=false;
+    if(mode=="clear")tgtEl.animate([{transform:"scale(1)",boxShadow:"0 0 0 #5cc8ff"},{transform:"scale(1.15)",boxShadow:"0 0 24px #5cc8ff"},{transform:"scale(1)",boxShadow:"0 0 0 #5cc8ff"}],{duration:600});
+    done&&done()};
+  const key=e=>{if(e.key=="Escape"||e.key=="Enter")end()};
+  addEventListener("keydown",key);wrap.onclick=end;wrap.classList.add("on");
+  const loop=now=>{if(ended)return;const t=now-t0;if(t>=total)return end();ctx.clearRect(0,0,w,h);if(mode=="enter")fxEnter(ctx,w,h,t,kind,P,fxLabel(g));else fxClear(ctx,w,h,t,kind,P,st);raf=requestAnimationFrame(loop)};
+  raf=requestAnimationFrame(loop);
+}
+// Secret rank (S+).
+// Only the hash of the secret key is stored. To change the key: python3 tools/hashkey.py NEWWORD
+const SECRET_HASH=91115514;
+function plusHtml(r){if(r<6||!S.sec)return"";if(S.plus)return `<div class="w v"><h2>S+ unlocked</h2><div class="mu">Commitment proven.</div></div>`;return `<div class="w r"><h2>Secret rank</h2><div class="mu">${(S.att||0)>=3?"The system has sealed it.":(S.att||0)==2?"Warning. One attempt remains. Failure will seal the secret rank until you prestige.":"Something is hidden beyond S."}</div>${(S.att||0)>=3?"":`<input id="pk" placeholder="Key" style="margin-top:8px"><button class="go" style="margin-top:8px" onclick="plusTry()">Submit</button>`}<div class="mu" id="pm" style="margin-top:8px"></div></div>`}
+function secretSeq(){S.sec=true;save();const o=$("ov");banner("System","S","Maximum rank confirmed.");setTimeout(()=>o.classList.add("glitch"),1900);setTimeout(()=>{$("ot").textContent="Anomaly detected";$("or").textContent="???";$("om").textContent="Secret rank unlocked."},2500);setTimeout(()=>o.classList.remove("glitch"),3100);setTimeout(()=>{o.classList.remove("on");render()},4800)}
+function plusTry(){if(hash($("pk").value.trim().toUpperCase())===SECRET_HASH){S.plus=true;save();render();banner("Beyond S","S+","Your commitment has been proven.")}else{S.att=(S.att||0)+1;save();render();S.att==2?banner("Warning","!","Careful. One attempt remains. Failure will seal the secret rank until you prestige."):toast(S.att>=3?"The secret rank is sealed.":"Invalid key.")}}
+// Prestige: from rank S (or S+), reset to EE and gain one permanent star. Special keys are kept.
+// A star earned from S+ is gold with a plus marker and is cosmetic only. Stars are never lost.
+// Attempts at the secret key reset on every prestige, so there is no permanent lockout. The discovery sequence replays when the new run reaches S.
+const starsText=()=>S.stars.map(s=>s.plus?"★+":"★").join(" ");
+function prestigeHtml(r){
+  if(r<6)return"";
+  const first=!S.stars.some(s=>!s.plus);
+  return `<div class="w v"><h2>Prestige</h2><div class="mu">Reset to rank EE and gain a permanent star. Special keys are kept.${S.plus?" You hold S+: this star is gold with a plus marker and gives no benefit.":first?" Your first star adds a second daily-quest column. Further stars are cosmetic.":" Further stars are cosmetic."}</div><button style="margin-top:8px" onclick="prestige(this)">Prestige</button></div>`;
+}
+function prestige(b){
+  if(ri()<6)return;
+  if(!b.dataset.c){b.dataset.c="1";b.textContent="Tap again: resets rank to EE";setTimeout(()=>{b.dataset.c="";b.textContent="Prestige"},4000);return}
+  const plus=S.plus===true;
+  S.stars.push({plus});S.xp=0;S.fl=0;S.att=0;S.plus=false;S.sec=false;S.pend=null; // sec reset: reaching S again replays the discovery sequence
+  save();render();banner("Prestige",plus?"★+":"★","Rank reset to EE. A permanent star is recorded.");
+}
+// All exercise data lives here. To add an exercise, add one entry to EX: quests, gates and the info panel pick it up.
+// part: 0 Legs, 1 Chest, 2 Core, 3 Back. med: [min,max] reps for a medium quest at rank EE.
+// fr: stick-figure frames (start, middle, end), side view on an 80x60 canvas, floor at y=56. Each frame lists joint
+// points: head, neck, pelvis, elbow, wrist, knee, foot [, knee2, foot2]. mirror:true draws the same limbs mirrored
+// about the pelvis (front-view moves). All figures are original, drawn as inline SVG, so they work offline.
+const PU=[[14,26,18,29,45,38,18,42,18,54,60,46,72,54],[14,35,18,38,45,43,26,46,18,54,60,48,72,54],[14,44,18,46,45,48,28,50,18,54,60,51,72,54]]; // side-view push-up frames, shared by the width variations
+const EX={
+squats:{nm:"squats",part:0,med:[12,20],
+ d:"Stand with feet shoulder-width apart. Lower your hips back and down as if sitting in a chair, then stand tall again.",
+ cues:["Knees track over your toes, not caving inward","Chest up, back flat","Heels stay on the floor","Go only as low as you can control"],
+ easier:"Squat to a chair: sit down lightly, then stand up.",
+ fr:[[40,10,40,16,40,32,46,20,52,19,40,44,40,56],[39,16,38,22,32,38,48,24,54,23,46,42,40,56],[39,22,37,28,28,44,48,28,54,27,48,44,40,56]]},
+lunges:{nm:"lunges",part:0,med:[10,16],
+ d:"Step one foot forward and lower until both knees bend about 90 degrees. Push back to standing and switch legs. Count each step as one rep.",
+ cues:["Front knee stays above the ankle","Torso upright","Back knee lowers toward the floor without slamming","Take a step long enough to keep balance"],
+ easier:"Hold a wall or chair for balance and make the step shorter.",
+ fr:[[40,10,40,16,40,32,44,24,40,34,40,44,40,56,40,44,40,56],[40,16,40,22,40,36,44,28,40,34,52,42,54,56,32,50,24,56],[40,24,40,30,40,44,44,36,40,42,54,46,54,56,32,54,22,56]]},
+jumping_jacks:{nm:"jumping jacks",part:0,med:[20,30],mirror:true,
+ d:"Jump your feet wide while swinging your arms overhead, then jump back to standing with arms at your sides.",
+ cues:["Land softly on the balls of your feet","Keep knees slightly bent","Breathe steadily","Keep a rhythm you can hold"],
+ easier:"Step one foot out at a time and raise your arms, no jump.",
+ fr:[[40,10,40,16,40,32,46,24,47,34,44,44,44,56],[40,10,40,16,40,32,52,18,58,10,48,44,52,56],[40,10,40,16,40,32,50,12,48,3,52,44,58,56]]},
+pushups:{nm:"push-ups",part:1,med:[10,20],
+ d:"Hands under your shoulders, body in one straight line from head to heels. Lower your chest toward the floor, then press back up.",
+ cues:["Body stays in a straight line, hips not sagging","Elbows about 45 degrees from your body","Lower with control","Neck relaxed, eyes on the floor"],
+ easier:"Do them on your knees or with hands on a raised surface such as a table.",
+ fr:[[14,26,18,29,45,38,18,42,18,54,60,46,72,54],[14,35,18,38,45,43,26,46,18,54,60,48,72,54],[14,44,18,46,45,48,28,50,18,54,60,51,72,54]]},
+situps:{nm:"sit-ups",part:2,med:[10,20],
+ d:"Lie on your back with knees bent and feet flat. Curl your upper body up toward your knees, then lower back down with control.",
+ cues:["Do not pull on your neck","Exhale as you rise","Lower slowly instead of dropping","Keep feet on the floor"],
+ easier:"Crunches: lift only your shoulders off the floor.",
+ fr:[[10,50,15,51,40,52,22,48,16,48,52,40,60,52],[18,35,22,40,40,52,30,40,36,40,52,40,60,52],[30,22,32,28,40,52,40,34,46,38,52,40,60,52]]},
+leg_raises:{nm:"leg raises",part:2,med:[8,14],
+ d:"Lie on your back with legs straight. Raise your legs until they point to the ceiling, then lower them slowly without touching the floor.",
+ cues:["Press your lower back gently into the floor","Move slowly, no swinging","Keep legs as straight as is comfortable","Stop lowering where your back starts to arch"],
+ easier:"Bend your knees while raising and lowering.",
+ fr:[[10,50,15,51,40,52,24,52,32,52,54,52,68,52],[10,50,15,51,40,52,24,52,32,52,52,42,64,32],[10,50,15,51,40,52,24,52,32,52,40,38,40,24]]},
+back_ext:{nm:"back extensions",part:3,med:[10,16],
+ d:"Lie face down with arms stretched forward. Lift your chest and arms slightly off the floor, pause, then lower with control.",
+ cues:["Lift only a little, no need to arch hard","Look at the floor to keep your neck long","Squeeze your upper back","Move slowly"],
+ easier:"Keep your arms by your sides and lift only your chest a few centimetres.",
+ fr:[[62,50,54,52,38,53,62,54,74,54,24,54,8,54],[62,42,54,46,38,53,62,48,72,46,24,54,8,54],[62,35,54,40,38,53,63,40,72,38,24,52,8,52]]},
+glute_bridge:{nm:"glute bridges",part:0,med:[12,20],
+ d:"Lie on your back with knees bent and feet flat. Press through your heels to lift your hips until your body forms a line from shoulders to knees, then lower slowly.",
+ cues:["Push through your heels","Squeeze your glutes at the top","Do not arch your lower back","Lower with control"],
+ easier:"Lift your hips only a few centimetres and hold for a moment.",
+ fr:[[10,50,15,51,40,52,24,53,34,54,52,40,60,52],[10,50,15,51,40,46,24,53,34,54,52,39,60,52],[10,50,15,51,40,38,24,53,34,54,52,38,60,52]]},
+calf_raises:{nm:"calf raises",part:0,med:[15,25],
+ d:"Stand tall with feet hip-width apart. Rise onto the balls of your feet, pause, then lower your heels slowly.",
+ cues:["Rise straight up, do not roll outward","Pause at the top","Lower slowly","Hold a wall if you need balance"],
+ easier:"Hold a wall or chair with both hands.",
+ fr:[[40,12,40,18,40,34,44,26,46,34,40,45,40,56],[40,9,40,15,40,31,44,23,46,31,40,42,40,53],[40,6,40,12,40,28,44,20,46,28,40,39,40,50]]},
+wide_pushups:{nm:"wide push-ups",part:1,med:[8,16],
+ d:"Like a push-up, but with hands placed wider than your shoulders. Lower your chest between your hands, then press back up.",
+ cues:["Hands slightly wider than shoulders","Body in a straight line","Elbows point out and slightly back","Lower with control"],
+ easier:"Do them on your knees or against a wall.",
+ fr:PU},
+diamond_pushups:{nm:"diamond push-ups",part:1,med:[6,12],
+ d:"Place your hands close together under your chest, thumbs and index fingers nearly touching. Lower your chest toward your hands, then press up.",
+ cues:["Elbows stay close to your ribs","Body in a straight line","Go only as low as you can control","Stop if your wrists or elbows hurt"],
+ easier:"Do them on your knees, or use a normal push-up width.",
+ fr:PU},
+pike_pushups:{nm:"pike push-ups",part:1,med:[6,12],
+ d:"Start with hips high and body in an upside-down V. Bend your elbows to lower your head toward the floor between your hands, then press back up.",
+ cues:["Keep hips high","Head moves between your hands, not in front","Keep your back flat","Move slowly"],
+ easier:"Raise your hands on a sturdy chair so the angle is gentler.",
+ fr:[[23,41,28,36,46,18,27,45,26,54,55,36,64,54],[24,45,28,42,46,20,34,48,26,54,55,37,64,54],[24,50,28,48,46,22,36,52,26,54,55,38,64,54]]},
+mountain_climbers:{nm:"mountain climbers",part:2,med:[20,30],
+ d:"From a straight-arm plank, drive one knee toward your chest, then switch legs in a steady rhythm. Count each knee drive as one rep.",
+ cues:["Shoulders over your wrists","Hips level, not bouncing up","Keep a pace you can control","Breathe steadily"],
+ easier:"Slow it down, or put your hands on a raised surface.",
+ fr:[[14,26,18,29,45,38,18,42,18,54,59,46,72,54,59,46,72,54],[14,26,18,29,45,38,18,42,18,54,32,44,40,54,59,46,72,54],[14,26,18,29,45,38,18,42,18,54,59,46,72,54,32,44,40,54]]},
+flutter_kicks:{nm:"flutter kicks",part:2,med:[16,30],
+ d:"Lie on your back with legs straight and low. Alternate small up-and-down kicks. Count each kick as one rep.",
+ cues:["Press your lower back into the floor","Small, controlled kicks","Keep legs as straight as is comfortable","Raise your legs higher if your back starts to arch"],
+ easier:"Bend your knees slightly, or keep your feet higher off the floor.",
+ fr:[[10,50,15,51,40,52,24,52,32,52,54,48,68,44,54,52,68,52],[10,50,15,51,40,52,24,52,32,52,54,50,68,48,54,50,68,48],[10,50,15,51,40,52,24,52,32,52,54,52,68,52,54,48,68,44]]},
+bird_dog:{nm:"bird dogs",part:3,med:[8,14],
+ d:"On hands and knees, reach one arm forward and the opposite leg back until they are level with your body. Return and switch sides. Count each reach as one rep.",
+ cues:["Keep your hips and shoulders level","Move slowly, no swinging","Neck long, eyes on the floor","Do not arch your lower back"],
+ easier:"Lift only the arm or only the leg at first.",
+ fr:[[63,30,56,34,30,34,57,44,58,54,30,54,14,54],[63,30,56,34,30,34,66,38,75,34,19,36,8,40],[63,30,56,34,30,34,67,34,77,33,18,34,6,34]]},
+good_morning:{nm:"good mornings",part:3,med:[12,20],
+ d:"Stand with hands behind your head and knees slightly bent. Push your hips back and tip forward with a flat back, then stand up by driving your hips forward.",
+ cues:["Hinge at the hips, not the waist","Back stays flat","Knees slightly bent","Go only as far as you can keep a flat back"],
+ easier:"Keep your hands on your hips and tip forward only a little.",
+ fr:[[40,10,40,16,40,32,35,13,40,8,40,44,40,56],[57,17,52,22,36,32,48,16,54,12,37,44,38,56],[55,26,50,28,34,32,46,22,52,23,36,44,38,56]]}
+};
+const EXIDS=Object.keys(EX);
+const exOf=part=>EXIDS.filter(k=>EX[k].part===part);
+
+// Draw one frame. Joints: 0 head, 1 neck, 2 pelvis, 3 elbow, 4 wrist, 5 knee, 6 foot, 7 knee2, 8 foot2.
+function figSvg(f,mirror){
+  const P=[];for(let i=0;i<f.length;i+=2)P.push([f[i],f[i+1]]);
+  const q=a=>a[0]+" "+a[1],mx=a=>[2*P[2][0]-a[0],a[1]];
+  let d="M"+q(P[1])+"L"+q(P[2])+"M"+q(P[1])+"L"+q(P[3])+"L"+q(P[4])+"M"+q(P[2])+"L"+q(P[5])+"L"+q(P[6]);
+  if(P[7])d+="M"+q(P[2])+"L"+q(P[7])+"L"+q(P[8]);
+  if(mirror)d+="M"+q(P[1])+"L"+q(mx(P[3]))+"L"+q(mx(P[4]))+"M"+q(P[2])+"L"+q(mx(P[5]))+"L"+q(mx(P[6]));
+  return `<svg viewBox="0 0 80 60" role="img" aria-label="Movement frame"><path d="M2 56H78" class="fl"/><path d="${d}" class="ln"/><circle cx="${P[0][0]}" cy="${P[0][1]}" r="4" class="hd"/></svg>`;
+}
+const exInfoBtn=ids=>`<button class="ib" aria-label="Exercise info" onclick="showEx('${ids}')">i</button>`;
+function exCard(id){
+  const x=EX[id],lab=["Start","Middle","End"];
+  return `<div class="exc"><h2>${x.nm[0].toUpperCase()+x.nm.slice(1)}</h2><div class="exf">${x.fr.map((f,i)=>`<figure>${figSvg(f,x.mirror)}<figcaption class="mu">${lab[i]}</figcaption></figure>`).join("")}</div><p>${x.d}</p><div class="mu">Form cues</div><ul>${x.cues.map(c=>`<li>${c}</li>`).join("")}</ul><div class="mu">Easier variation</div><p>${x.easier}</p></div>`;
+}
+function showEx(ids){
+  $("exb").innerHTML=ids.split(",").map(exCard).join("")+`<p class="mu">Stop if anything hurts. Move within what is comfortable for your body.</p>`;
+  $("ex").classList.add("on");$("exx").focus();
+}
+const hideEx=()=>$("ex").classList.remove("on");
+// Read-only weekly and monthly summaries. One compact record per week in S.hist, never one per action.
+// Record: c cleared days, xp gained, xl XP lost to penalties, v volume (reps), st best streak,
+// g gate result (0 none, 1 partial, 2 cleared), bp completed quests per body part [legs, chest, core, back]
+// (kept for a future radar chart). Summaries are information only and never become tasks.
+const hrec=(w=weekId())=>{const h=S.hist||(S.hist={});return h[w]||(h[w]={c:0,xp:0,xl:0,v:0,st:0,g:0,bp:[0,0,0,0]})};
+const histAdd=(f,n,w)=>{const r=hrec(w);r[f]=Math.max(0,r[f]+n)};
+function histSync(){const r=hrec();r.c=weekDone(weekId());r.st=Math.max(r.st,streak())}
+function histClear(q){const r=hrec();r.bp[q.p]++;if(q.ex2)r.bp[q.p2]++;r.v+=q.amt+(q.amt2||0);histSync()}
+const histGate=(w,res)=>{const r=hrec(w);r.g=Math.max(r.g,res)};
+
+let sumView="w";
+const sumSet=v=>{sumView=v;render()};
+const wkLabel=w=>new Date(w+"T12:00:00").toLocaleDateString(undefined,{month:"short",day:"numeric"});
+function sumLine(r,extra){
+  const bp=PT.map((p,i)=>p.n+" "+r.bp[i]).join(" · ");
+  return `<div class="mu">Cleared days: <b>${r.c}</b> · Best streak: <b>${r.st}</b> · XP: <b class="xp">+${r.xp}</b>${r.xl?" (−"+r.xl+" penalties)":""}<br>${extra}<br>Volume: <b>${r.v}</b> reps<br>Quests by body part: ${bp}</div>`;
+}
+function summaryHtml(){
+  const h=S.hist||{},ws=Object.keys(h).sort().reverse();
+  let body="";
+  if(sumView=="w"){
+    body=ws.slice(0,8).map(w=>`<div class="w"><h2>Week of ${wkLabel(w)}${w==weekId()?" (this week)":""}</h2>${sumLine(h[w],"Gate: "+["none","partial","cleared"][h[w].g])}</div>`).join("");
+  }else{
+    const m={};ws.forEach(w=>{const k=w.slice(0,7),r=m[k]||(m[k]={c:0,xp:0,xl:0,v:0,st:0,g:0,gc:0,bp:[0,0,0,0]}),x=h[w];
+      r.c+=x.c;r.xp+=x.xp;r.xl+=x.xl;r.v+=x.v;r.st=Math.max(r.st,x.st);if(x.g==2)r.gc++;x.bp.forEach((n,i)=>r.bp[i]+=n)});
+    body=Object.keys(m).sort().reverse().slice(0,6).map(k=>`<div class="w"><h2>${new Date(k+"-15T12:00:00").toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2>${sumLine(m[k],"Gates cleared: "+m[k].gc)}</div>`).join("");
+  }
+  return `<div class="w"><h2>Summary</h2><div class="mu">A record of your progress. Nothing here is required.</div><div class="row" style="justify-content:flex-start;margin-top:8px"><button class="${sumView=="w"?"go":""}" onclick="sumSet('w')">Weekly</button><button class="${sumView=="m"?"go":""}" onclick="sumSet('m')">Monthly</button></div></div>`+(body||`<div class="w"><div class="mu">No records yet. They appear after your first quest.</div></div>`)+(sumView=="m"?`<div class="mu" style="margin:0 4px">A week counts toward the month it starts in.</div>`:"");
+}
+// First-open tutorial. Skippable, shown once (S.tut), replayable from Setup.
+const TUT=[
+["System online","Player registered. Rank: EE. A short orientation follows. You may skip it."],
+["Daily quests","Three quests are issued each day. Select one and complete it. Easy holds the streak. Harder quests pay more XP. The (i) button shows the movement and its form."],
+["XP and rank","XP raises your rank: EE, E, D, C, B, A, S. A day without a cleared quest costs XP. One penalty applies per return, however long the absence."],
+["Rank floors","A rank, once reached, becomes your floor. XP may fall, rank will not. Exception: rank S can fall back to A. Maintain it."],
+["Rest tokens","Clearing a gate yields a rest token, up to 2. Spend one to hold your streak and lose no XP. A rest day does not count toward the 5 cleared days."],
+["Gates","Clear 5 quest days in a week at rank D or higher. The gate opens Friday 18:00 and expires Sunday midnight. A cleared gate unlocks the reward wheel."],
+["Co-op","A friend's code swaps your gate for a shared one. Each of you completes half of the reps. Partner reps are self-reported. You earn full XP. A joined gate may be left before starting, without penalty."],
+["Orientation complete","Proceed."]
+];
+let tutI=0;
+function tutShow(){
+  $("tut").classList.add("on");const[t,m]=TUT[tutI];
+  $("tt").textContent=t;$("tm").textContent=m;$("tc").textContent=(tutI+1)+" / "+TUT.length;
+  $("tn").textContent=tutI==TUT.length-1?"Begin":"Next";$("tn").focus();
+}
+function tutStart(){tutI=0;tutShow()}
+function tutNext(){if(tutI>=TUT.length-1)return tutEnd();tutI++;tutShow()}
+function tutEnd(){$("tut").classList.remove("on");if(!S.tut){S.tut=true;save()}}
+// Shared UI: banner, toast, zap animation, tabs, main render.
+function banner(t,r,m){$("ot").textContent=t;$("or").textContent=r;$("om").textContent=m;$("ov").classList.add("on")}
+function toast(t){let e=$("ts");if(!e){e=document.createElement("div");e.id="ts";e.setAttribute("role","status");document.body.appendChild(e)}e.textContent=t;e.className="on";clearTimeout(toast.t);toast.t=setTimeout(()=>e.className="",3500)}
+function zap(el){if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;const to=$("rk").getBoundingClientRect(),fr=(el||$("rk")).getBoundingClientRect();const x0=fr.left+fr.width/2,y0=fr.top+fr.height/2,dx=to.left+to.width/2-x0,dy=to.top+to.height/2-y0;const b=document.createElement("div");b.className="bolt";b.textContent="⚡";b.style.left=x0+"px";b.style.top=y0+"px";document.body.appendChild(b);const a=b.animate([{transform:"translate(-50%,-50%) scale(.6)"},{transform:`translate(calc(-50% + ${dx*.5}px),calc(-50% + ${dy*.5-40}px)) scale(1.7)`,offset:.5},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.8)`}],{duration:650,easing:"cubic-bezier(.5,0,.8,.4)"});a.onfinish=()=>{b.remove();$("rk").animate([{textShadow:"0 0 16px #4fb8ff99",transform:"scale(1)"},{textShadow:"0 0 40px #fff,0 0 60px #4fb8ff",transform:"scale(1.25)"},{textShadow:"0 0 16px #4fb8ff99",transform:"scale(1)"}],{duration:550});$("xb").animate([{boxShadow:"0 0 8px #4fb8ff"},{boxShadow:"0 0 30px #fff"},{boxShadow:"0 0 8px #4fb8ff"}],{duration:550})}}
+function tab(t){document.querySelectorAll(".sec").forEach(e=>{e.classList.toggle("on",e.id==t);e.classList.remove("enter");if(e.id==t){void e.offsetWidth;e.classList.add("enter")}});setTimeout(()=>$(t).classList.remove("enter"),500);[...$("nv").children].forEach(b=>b.classList.toggle("on",b.dataset.t==t));render()}
+[["today","Quest"],["gate","Gates"],["sum","Summary"],["set","Setup"]].forEach(([t,l])=>{const b=document.createElement("button");b.textContent=l;b.dataset.t=t;b.onclick=()=>tab(t);$("nv").appendChild(b)});
+function render(){
+  const r=ri(),nx=T[r+1],cur=T[r];
+  $("rk").textContent=R[r]+(S.plus&&r==6?"+":"");$("sr").textContent=starsText();$("xt").textContent=nx?(S.xp-cur)+" / "+(nx-cur)+" XP to "+R[r+1]:"Max rank";$("xb").style.width=(nx?(S.xp-cur)/(nx-cur)*100:100)+"%";$("sk").textContent="Streak: "+streak()+" days";
+  const d=today(),e=S.days[d]||{},qs=quests(d);
+  $("today").innerHTML=(sgActive()?sgHtml():dailyHtml(e))+`
+  <div class="w"><h2>This week</h2><div class="mu">${weekDone(weekId())} of 5 quests done this week. Clear 5 by Sunday to qualify for this week's gate, which opens Friday 18:00. Easy quests count. Rest days do not.${r<2?" (unlocks at rank D)":""}.</div></div>`+habitHtml(e)+plusHtml(r)+prestigeHtml(r)+restHtml(e);
+  const w=weekId(),n=weekDone(w),st=gateState(w);
+  let h=unsettled().slice(0,1).map(uw=>{const u=G(uw);return `<div class="w v"><h2>Last week's gate</h2><div class="mu">${PT[u.p].n} key · rank ${R[u.kr]} · ${u.done?"cleared. Reward waiting.":u.prog+" / "+target(u)+" done. Time is up."}</div><button class="go" style="margin-top:8px" onclick="${u.done?"wheelFx":"claimPartial"}('${uw}')">${u.done?"Claim reward":"Collect partial XP"}</button></div>`}).join("");
+  if(st=="locked"){h+=`<div class="w v"><h2>Weekend gate</h2><div class="mu">${r<2?"Reach rank D to unlock gates.":"Clear 5 quests this week ("+n+"/5). Easy quests count. Rest days do not."} Gates open Friday 18:00 and expire Sunday midnight.</div></div>`}
+  else if(st=="waiting"){h+=`<div class="w v"><h2>Weekend gate</h2><div class="mu">Eligible (${n}/5 quests cleared). Opens Friday 18:00, in ${fmtLeft(gateOpenMs(w)-nowMs())}. Expires Sunday midnight.</div></div>`}
+  else{const g=gateFor(w),t=target(g),open=g.start&&nowMs()<gEnd(g,w),over=g.kr-r>=2,left=fmtLeft(gEnd(g,w)-nowMs());
+    h+=`<div class="w ${over?"r":"v"} flame" style="--c:${KC[g.kr]}"><h2>${over?"Out-of-reach gate":"Weekend gate"}${g.coop?" (co-op)":""}</h2><div class="mu"><span class="key" style="background:${PT[g.p].c}"></span>${PT[g.p].n} key · rank ${R[g.kr]}</div><p><b style="font-size:20px">${t} ${PT[g.p].e}</b> ${exInfoBtn(PT[g.p].x)}<br><span class="mu">${over?"Far above your rank. Optional. ":""}Base reward <span class="xp">+${gateXp(g)} XP</span> × wheel (${g.coop?"1.8–3x":"1.5–2.2x"}) · unfinished at expiry pays 70% of base, in proportion to progress · expires Sunday midnight${g.start?"":" ("+left+" left)"} ${g.coop?`<br><span class="mu">Formula: total ${t*2} = your share ${t} + partner's share ${t}. Cleared when your reps reach ${t} and combined reps reach ${t*2}. You earn full XP.</span>`:""} · split it into sets and stop if anything hurts.</span></p>
+    ${!g.start&&g.coop?`<button onclick="leaveCo()" style="margin-right:8px">Use my own gate</button>`:""}${!g.start?`<button class="go" onclick="openGate()">Enter the gate</button>`:`<div class="bar"><i style="width:${g.prog/t*100}%"></i></div><div class="mu">${g.coop?"You ":""}${g.prog} / ${t}${g.coop?" · Partner "+(g.pp||0)+" / "+t:""} · ${open?left+" left":"time is up"}</div>${g.coop&&open&&!g.paid?`<div class="mu" style="margin-top:8px">Partner's reps (honor system)</div><input type="number" min="0" inputmode="numeric" value="${g.pp||0}" onchange="setPartner(this.value)">`:""}${open&&!g.done?`<div class="row" style="margin-top:8px">${[1,5,10,25].map(k=>`<button onclick="addProg(${k})">+${k}</button>`).join("")}</div><div class="row" style="margin-top:8px;justify-content:flex-start">${[1,5].map(k=>`<button onclick="addProg(-${k})">−${k}</button>`).join("")}<input id="cv" type="number" min="1" inputmode="numeric" placeholder="Custom" style="width:90px"><button onclick="addCustom(1)">+</button><button onclick="addCustom(-1)">−</button></div>`:""}${!open&&!g.paid&&!g.done?`<button class="go" style="margin-top:8px" onclick="claimPartial()">Collect partial XP</button>`:""}${g.done&&!g.paid?`<button class="go" style="margin-top:8px" onclick="wheelFx()">Claim reward</button>`:""}${g.paid?`<div class="xp" style="margin-top:8px">Reward collected</div>`:""}`}</div>`}
+  h+=keysHtml();
+  $("gate").innerHTML=h;
+  const g2=st!="locked"?gateFor(w):null;
+  $("gate").insertAdjacentHTML("beforeend",`<div class="w"><h2>Co-op gate</h2><div class="mu">Swap your weekend gate for a shared one. Each of you does half the reps, and and the bonus wheel pays more (1.8x to 3x instead of 1.5x to 2.2x).</div>${g2&&!g2.start?`<p class="mu">Your share code</p><textarea readonly style="height:60px" onclick="this.select()">${code()}</textarea>`:`<p class="mu">Your code appears here once your weekend gate is open and not yet started.</p>`}<p class="mu">Join a friend, or add a key code</p><input id="jc" placeholder="Paste friend's code"><button class="go" style="margin-top:8px" onclick="join()">Join with code</button><div class="mu" style="margin-top:8px">${S.jm||"Paste a friend's code to join their gate or add their key."}</div></div>`);
+  $("sum").innerHTML=summaryHtml();
+  $("set").innerHTML=`<div class="w"><h2>Daily window</h2><div class="mu">When can you train? You get a reminder 30 minutes before it opens.</div>${tp2()}<div class="mu" style="margin-top:12px">Window length</div><div class="row" style="justify-content:flex-start;margin-top:6px"><button class="${(S.win.len||2)==1?"go":""}" onclick="setLen(1)">1 hour</button><button class="${(S.win.len||2)==2?"go":""}" onclick="setLen(2)">2 hours</button></div><div class="mu" style="margin-top:8px">Closes at <b style="color:#fff">${endT()}</b></div></div>
+  <div class="w"><h2>Daily reminder</h2><div class="mu">Do you want a reminder 30 minutes before your window opens?</div><div class="row" style="margin-top:8px;justify-content:flex-start"><button class="${S.rem===1?"go":""}" onclick="remind(1)">Yes</button><button class="${S.rem===0?"go":""}" onclick="remind(0)">No</button></div>${S.rem===1?`<div class="mu" style="margin-top:8px">Reminder file created. If your device did not open it, copy this text into a file named reminder.ics:</div><textarea readonly onclick="this.select()">${ics()}</textarea>`:""}</div>
+  <div class="w"><h2>Backup</h2><div class="mu">Export copies your progress as text. Keep it somewhere safe. To restore, paste it here and press Import.</div><textarea id="jx" style="margin-top:8px"></textarea><div class="row" style="justify-content:flex-start;margin-top:8px"><button onclick="expJ()">Export</button><button onclick="impJ()">Import</button></div></div>
+  <div class="w"><div class="row" style="justify-content:flex-start;gap:12px"><div style="width:44px;height:44px">${LOGO}</div><div><h2>The System | Fitness Tracker</h2><div class="mu">Offline. No accounts, no network, no tracking. Your data stays on this device. GPL-3.0 licensed.</div></div></div></div>
+  <div class="w"><button onclick="tutStart()">Replay tutorial</button> <button onclick="resetTap(this)">Reset progress</button></div>`;
+}
+function resetTap(b){if(b.dataset.c){keepPrev();S=def();save();render();toast("Progress reset.")}else{b.dataset.c="1";b.textContent="Tap again to confirm reset";setTimeout(()=>{b.dataset.c="";b.textContent="Reset progress"},4000)}}
+// Setup tab helpers: daily window, reminder, test tools.
+function ics(){
+  const[s]=S.win.s.split(":").map(Number),m=+S.win.s.split(":")[1];let t=s*60+m-30;if(t<0)t+=1440;
+  const hh=String(Math.floor(t/60)).padStart(2,"0"),mm=String(t%60).padStart(2,"0");
+  return["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//gate//EN","BEGIN:VEVENT","UID:gate-daily@local","DTSTART:20260101T"+hh+mm+"00","DURATION:PT30M","RRULE:FREQ=DAILY","SUMMARY:The gate opens in 30 minutes","DESCRIPTION:Your daily quest is waiting. The window is "+S.win.s+" to "+endT()+".","BEGIN:VALARM","TRIGGER:PT0M","ACTION:DISPLAY","DESCRIPTION:The gate opens soon","END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
+}
+function remind(v){S.rem=v;if(v){try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([ics()],{type:"text/calendar"}));a.download="reminder.ics";a.click()}catch(e){}}save();render()}
+function endT(){const[h,m]=S.win.s.split(":").map(Number),t=(h*60+m+60*(S.win.len||2))%1440;return String(Math.floor(t/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0")}
+function setHM(h12,m,pm){const h=h12%12+(pm?12:0);S.win.s=String(h).padStart(2,"0")+":"+String(m).padStart(2,"0");save();render()}
+function setH(v){const[h,m]=S.win.s.split(":").map(Number);setHM(+v,m,h>=12)}
+function setM(v){const[h]=S.win.s.split(":").map(Number);setHM(h%12||12,+v,h>=12)}
+function setP(v){const[h,m]=S.win.s.split(":").map(Number);setHM(h%12||12,m,+v==1)}
+function setLen(n){S.win.len=n;save();render()}
+function tp2(){const[h,m]=S.win.s.split(":").map(Number),h12=h%12||12;const sel=(opts,cur,fn)=>`<select class="sl" onchange="${fn}(this.value)">${opts.map(o=>`<option value="${o[0]}" ${o[0]==cur?"selected":""}>${o[1]}</option>`).join("")}</select>`;return `<div class="tp"><div class="mu">Opens at <b style="color:#fff;font-size:18px">${S.win.s}</b></div><div class="row" style="justify-content:flex-start;margin-top:6px">${sel([...Array(12).keys()].map(i=>[i+1,i+1]),h12,"setH")}${sel([...Array(12).keys()].map(i=>[i*5,String(i*5).padStart(2,"0")]),m,"setM")}${sel([[0,"AM"],[1,"PM"]],h>=12?1:0,"setP")}</div></div>`}
+// Boot
+S=loadSave();sgExpire();penalty();pendShow();tab("today");if(loadNote)toast(loadNote);
+if(!S.tut)tutStart();
+</script></body></html>

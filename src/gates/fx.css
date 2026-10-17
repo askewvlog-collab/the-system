@@ -1,0 +1,2 @@
+#fxw{position:fixed;inset:0;z-index:16;display:none;background:#000;cursor:pointer}#fxw.on{display:block}
+#fx{width:100%;height:100%;display:block}#fxs{position:absolute;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));text-align:center;opacity:.6;pointer-events:none}

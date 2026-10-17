@@ -1,0 +1,10 @@
+.env
+.env.*
+*.key
+*.pem
+secrets*
+node_modules/
+dist/
+.DS_Store
+tests/runner.html
+dev.html

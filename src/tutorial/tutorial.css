@@ -1,0 +1,2 @@
+#tut{position:fixed;inset:0;z-index:14;display:none;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 50% 38%,#2a1466f2,#000000fa 70%)}#tut.on{display:flex}
+#tut .w{max-width:420px;width:100%}#tut p{font-size:15px;line-height:1.5}

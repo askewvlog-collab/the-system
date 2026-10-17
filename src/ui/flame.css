@@ -1,0 +1,8 @@
+/* Animated flame/electric border, colored by key rank via --c. Used on gates and special gates. */
+@property --a{syntax:"<angle>";initial-value:0deg;inherits:false}
+.w.flame{--c:#a07bff;border:2px solid transparent;border-color:transparent;background:linear-gradient(#0a0818,#0a0818) padding-box,conic-gradient(from var(--a),transparent 0 50%,var(--c) 72%,#fff 78%,var(--c) 84%,transparent 100%) border-box;box-shadow:0 0 18px color-mix(in srgb,var(--c) 45%,transparent);animation:orbit 3.2s linear infinite,flick 1.3s ease-in-out infinite alternate}
+.w.flame:before,.w.flame:after{border-color:var(--c)}
+@keyframes orbit{to{--a:360deg}}
+@keyframes flick{0%{box-shadow:0 0 10px color-mix(in srgb,var(--c) 35%,transparent)}35%{box-shadow:0 0 26px color-mix(in srgb,var(--c) 60%,transparent)}70%{box-shadow:0 0 14px color-mix(in srgb,var(--c) 40%,transparent)}100%{box-shadow:0 0 30px color-mix(in srgb,var(--c) 65%,transparent)}}
+@media (prefers-reduced-motion:reduce){.w.flame{animation:none}}
+.kr{border-left:3px solid var(--c);padding-left:8px}

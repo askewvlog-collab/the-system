@@ -1,0 +1,1 @@
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cols .w{margin:12px 0;padding:10px;min-width:0}.cols .q{padding:8px;font-size:13px}.cols .q b{font-size:14px}.cols h2{font-size:14px}
