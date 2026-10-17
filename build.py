@@ -4,7 +4,7 @@ import pathlib, json, urllib.parse
 R = pathlib.Path(__file__).parent
 S = R / "src"
 # Load order matters: const declarations run at load. core first, boot last.
-ORDER = ["core/state.js", "core/save.js", "core/backup.js", "ranks/ranks.js", "ranks/rewards.js", "quests/quests.js",
+ORDER = ["core/state.js", "core/save.js", "core/backup.js", "ranks/ranks.js", "ranks/rewards.js", "quests/quests.js", "quests/pause.js",
          "gates/gates.js", "gates/keys.js", "gates/special.js", "gates/fx.js", "prestige/secret.js", "prestige/prestige.js", "exercises/exercises.js", "summaries/summaries.js", "tutorial/tutorial.js", "ui/ui.js", "ui/settings.js", "main.js"]
 read = lambda p: (S / p).read_text(encoding="utf-8")
 logo = read("ui/logo.svg").strip()

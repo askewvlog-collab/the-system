@@ -8,7 +8,7 @@ function raiseFloor(){const f=Math.min(5,ri());if(f>(S.fl||0))S.fl=f}
 // Remove XP without dropping below the floor. Returns the XP actually lost.
 function loseXp(n){const min=T[floorIdx()],l=Math.max(0,Math.min(n,S.xp-min));S.xp-=l;return l}
 function penalty(){
-  sgExpire();raiseFloor();const t=today();if(!S.chk){S.chk=t;save();return}
+  sgExpire();raiseFloor();pauseMark();const t=today();if(!S.chk){S.chk=t;save();return}
   // One ordinary missed-day penalty per return, however long the absence.
   let d=new Date(S.chk+"T12:00:00"),missed=0,n=0;
   while(ds(d)<t&&n<400){if(!dayDone(ds(d))&&!(S.days[ds(d)]&&S.days[ds(d)].rest))missed++;d.setDate(d.getDate()+1);n++}

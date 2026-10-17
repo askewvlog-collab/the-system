@@ -98,10 +98,10 @@ const hash=s=>{let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul
 function rnd(seed){let a=hash(seed);return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
 function weekId(d=now()){const x=new Date(d);const k=(x.getDay()+6)%7;x.setDate(x.getDate()-k);return ds(x)}
 // Save format, migrations, validation. A bad import or corrupt save never replaces a good one.
-// v1 = original build. v2 = adds the rank floor (fl). v3 = adds weekly summary records (hist). v4 = adds special keys, pending penalty choice. v5 = adds prestige stars. Add one MIGRATIONS step per version bump,
+// v1 = original build. v2 = adds the rank floor (fl). v3 = adds weekly summary records (hist). v4 = adds special keys, pending penalty choice. v5 = adds prestige stars. v6 = adds medical pause (pause, days.med). Add one MIGRATIONS step per version bump,
 // and add every new state field to sanitize() or it is dropped on load/import.
-const SAVE_VERSION=5;
-const MIGRATIONS={1:o=>({...o,fl:0,v:2}),2:o=>({...o,hist:{},v:3}),3:o=>({...o,keys:[],v:4}),4:o=>({...o,stars:[],v:5})};
+const SAVE_VERSION=6;
+const MIGRATIONS={1:o=>({...o,fl:0,v:2}),2:o=>({...o,hist:{},v:3}),3:o=>({...o,keys:[],v:4}),4:o=>({...o,stars:[],v:5}),5:o=>({...o,v:6})};
 const DATE=/^\d{4}-\d\d-\d\d$/,HM=/^([01]\d|2[0-3]):[0-5]\d$/;
 const isObj=x=>!!x&&typeof x==="object"&&!Array.isArray(x);
 const num=(x,lo,hi,d)=>typeof x==="number"&&isFinite(x)?Math.min(hi,Math.max(lo,x)):d;
@@ -115,7 +115,7 @@ function cleanGate(g){
 function sanitize(o){
   const s=def();s.xp=num(o.xp,0,1e7,0);s.fl=int(o.fl,0,5,0);s.chk=DATE.test(o.chk)?o.chk:null;
   if(isObj(o.days))for(const k of Object.keys(o.days)){const e=o.days[k];if(DATE.test(k)&&isObj(e)){const d={};
-    if(e.p!=null)d.p=int(e.p,0,2,undefined);if(e.p2!=null)d.p2=int(e.p2,0,2,undefined);for(const f of["done","hb","h","rest","sg","c2","done2"])if(e[f]===true)d[f]=true;s.days[k]=d}}
+    if(e.p!=null)d.p=int(e.p,0,2,undefined);if(e.p2!=null)d.p2=int(e.p2,0,2,undefined);for(const f of["done","hb","h","rest","sg","c2","done2","med"])if(e[f]===true)d[f]=true;s.days[k]=d}}
   if(isObj(o.gates))for(const k of Object.keys(o.gates)){const g=cleanGate(o.gates[k]);if(DATE.test(k)&&g)s.gates[k]=g}
   const c=cleanGate(o.co);if(c&&DATE.test(o.co.w)){c.w=o.co.w;s.co=c}
   if(isObj(o.win)){if(HM.test(o.win.s))s.win.s=o.win.s;if(HM.test(o.win.e))s.win.e=o.win.e;s.win.len=int(o.win.len,1,2,2)}
@@ -126,6 +126,7 @@ function sanitize(o){
     if(r>=0&&sd>=0&&Array.isArray(g.ex)&&g.ex.length===3&&g.ex.every(x=>EX[x])&&Array.isArray(g.t)&&Array.isArray(g.p))
       s.sg={id:keyCode({r,s:sd}),r,s:sd,start:num(g.start,0,1e15,0),end:num(g.end,0,1e15,0),ex:g.ex.slice(),t:[0,1,2].map(i=>int(g.t[i],1,9999,1)),p:[0,1,2].map(i=>int(g.p[i],0,9999,0)),run:g.run===true,done:g.done===true,bx:num(g.bx,0,1e6,0)}}
   if(Array.isArray(o.stars))s.stars=o.stars.slice(0,99).filter(isObj).map(x=>({plus:x.plus===true}));
+  if(isObj(o.pause)&&typeof o.pause.t==='number')s.pause={t:num(o.pause.t,0,1e15,0)};
   s.tok=int(o.tok,0,2,0);s.att=int(o.att,0,3,0);
   if(o.rem===0||o.rem===1)s.rem=o.rem;
   for(const f of["plus","sec","tut"])if(o[f]===true)s[f]=true;
@@ -168,7 +169,7 @@ function raiseFloor(){const f=Math.min(5,ri());if(f>(S.fl||0))S.fl=f}
 // Remove XP without dropping below the floor. Returns the XP actually lost.
 function loseXp(n){const min=T[floorIdx()],l=Math.max(0,Math.min(n,S.xp-min));S.xp-=l;return l}
 function penalty(){
-  sgExpire();raiseFloor();const t=today();if(!S.chk){S.chk=t;save();return}
+  sgExpire();raiseFloor();pauseMark();const t=today();if(!S.chk){S.chk=t;save();return}
   // One ordinary missed-day penalty per return, however long the absence.
   let d=new Date(S.chk+"T12:00:00"),missed=0,n=0;
   while(ds(d)<t&&n<400){if(!dayDone(ds(d))&&!(S.days[ds(d)]&&S.days[ds(d)].rest))missed++;d.setDate(d.getDate()+1);n++}
@@ -222,7 +223,7 @@ function questPanel(col,e){
   const pk=col?"p2":"p",dk=col?"done2":"done",qs=quests(today(),col);
   return `<div class="w"><h2>Daily quest${col?" 2":""}</h2><div class="mu">Choose one. Harder quests pay more. Skipping a day costs XP.</div>${qs.map((q,i)=>`<div class="qr"><button class="q ${e[pk]===i?"sel":""}" onclick="pick(${i},${col})" ${e[dk]?"disabled":""}><b>${qLabel(q)}</b><span class="mu">${qParts(q)} · ${TN[q.t]} · </span><span class="xp">+${q.xp} XP</span></button>${exInfoBtn(q.ex+(q.ex2?","+q.ex2:""))}</div>`).join("")}<button id="fin${col||""}" class="go q" style="text-align:center" onclick="finish(${col})" ${e[pk]==null||e[dk]?"disabled":""}>${e[dk]?"Quest cleared":"Mark quest complete"}</button></div>`;
 }
-const dailyHtml=e=>cols()>1?`<div class="cols">${questPanel(0,e)}${questPanel(1,e)}</div>`:questPanel(0,e);
+const dailyHtml=e=>paused()?pauseHtml():cols()>1?`<div class="cols">${questPanel(0,e)}${questPanel(1,e)}</div>`:questPanel(0,e);
 const MSG=[["Streak held. Easy quest logged.","Easy quest logged. The streak continues.","Minimum met. Streak intact.","Logged. Showing up counts."],["Medium quest cleared. Progress recorded.","Steady output. Rank progress continues.","Acceptable effort. Continue.","Medium quest logged. Consistency noted."],["Hard quest cleared. Output exceeds baseline.","Strong output. Logged.","Threshold exceeded. Recorded.","Hard quest cleared. Noted."]];
 // Habit for week w, built from the quests chosen in the week before it.
 function habit(w=weekId()){const pw=new Date(w+"T12:00:00");pw.setDate(pw.getDate()-7);const c=[0,0,0,0],a=[0,0,0,0],n=[0,0,0,0];for(let i=0;i<7;i++){const k=ds(pw),e=S.days[k];if(e&&e.done&&e.p!=null){const q=quests(k)[e.p];if(q){c[q.p]++;if(q.t==1&&q.ex===PT[q.p].x){a[q.p]+=q.amt;n[q.p]++}}}pw.setDate(pw.getDate()+1)}const p=c.indexOf(Math.max(...c));return c[p]>=3?{p,amt:Math.max(5,n[p]?Math.round(a[p]/n[p]):Math.round(EX[PT[p].x].med[0]*scale()))}:null}
@@ -236,6 +237,28 @@ function habitHtml(e){
 function restHtml(e){const t=S.tok||0;if(e.rest)return `<div class="w v"><h2>Rest day</h2><div class="mu">Streak protected. No XP lost. This day does not count toward your 5 days.</div></div>`;return `<div class="w"><h2 id="rt">Rest tokens: ${t} / 2</h2><div class="mu">Earned by clearing gates. A rest day keeps your streak and costs no XP, but does not count toward your 5 days.</div>${t>0&&!e.done?`<button style="margin-top:8px" onclick="useRest()">Use rest token</button>`:""}</div>`}
 function useRest(){const d=today(),e=S.days[d]||(S.days[d]={});if(e.done||e.rest||e.sg||!(S.tok>0))return;e.rest=true;S.tok--;save();render();toast("Rest day logged.")}
 function streak(){let n=0,d=now();if(!dayDone(today())&&!(S.days[today()]&&S.days[today()].rest))d.setDate(d.getDate()-1);while(dayDone(ds(d))||(S.days[ds(d)]&&S.days[ds(d)].rest)){if(dayDone(ds(d)))n++;d.setDate(d.getDate()-1)}return n}
+// Medical pause: for illness or injury. While paused every day is a rest day marked med: no XP penalty, the streak
+// and gate streak are held, no quests are issued, and a new gate cannot be entered. A started gate or special gate
+// can still be played; the special gate's timer is held. Paused days do not count toward the 5 cleared days.
+const paused=()=>!!S.pause;
+function pauseMark(){
+  if(!S.pause)return;
+  const t=today();let d=new Date((S.chk||t)+"T12:00:00");
+  for(let n=0;n<400&&ds(d)<=t;n++){const k=ds(d),e=S.days[k]||(S.days[k]={});if(!e.done&&!e.sg){e.rest=true;e.med=true}d.setDate(d.getDate()+1)}
+  S.chk=t;
+}
+function pauseStart(){if(S.pause)return;S.pause={t:nowMs()};pauseMark();save();render();toast("Medical pause started. No penalties apply.")}
+function pauseEnd(){
+  if(!S.pause)return;
+  const held=nowMs()-S.pause.t;S.pause=null;
+  if(S.sg&&!S.sg.done)S.sg.end+=Math.max(0,held); // the special gate timer was held
+  const e=S.days[today()];if(e&&e.med){delete e.rest;delete e.med}
+  S.chk=today();save();render();toast("Medical pause ended. Quests resume today.");
+}
+const pauseHtml=()=>`<div class="w v"><h2>Medical pause</h2><div class="mu">Paused. Rest and recover. No XP is lost, your streak and gate streak are held, and no quests are issued. Resume in Setup when you are ready.</div></div>`;
+function pauseSetupHtml(){
+  return `<div class="w"><h2>Medical pause</h2><div class="mu">For illness or injury. While paused: no XP penalties, your streak and gate streak are held, no quests are issued, and a new gate cannot be entered. Paused days do not count toward the 5 cleared days.</div>${S.pause?`<div class="mu" style="margin-top:8px">Paused since ${new Date(S.pause.t).toLocaleDateString()}.</div><button class="go" style="margin-top:8px" onclick="pauseEnd()">End pause</button>`:`<button style="margin-top:8px" onclick="pauseStart()">Start pause</button>`}</div>`;
+}
 // Weekly gate, co-op, reward wheel.
 function gateFor(w){
   const c=G(w);if(c){if(!c.start&&c.kr>ri())c.kr=ri();return c}
@@ -261,7 +284,7 @@ function gateEndMs(w){const d=new Date(w+"T00:00:00");d.setDate(d.getDate()+7);r
 const gEnd=(g,w)=>g.end||gateEndMs(w);
 const gateEligible=()=>ri()>=2&&weekDone(weekId())>=5;
 // locked: not eligible; waiting: eligible, before Friday 18:00; open: can enter / in progress
-function gateState(w=weekId()){if(!gateEligible())return"locked";if(nowMs()<gateOpenMs(w))return"waiting";return nowMs()<gateEndMs(w)?"open":"over"}
+function gateState(w=weekId()){const g0=G(w);if(S.pause&&!(g0&&g0.start))return"paused";if(!gateEligible())return"locked";if(nowMs()<gateOpenMs(w))return"waiting";return nowMs()<gateEndMs(w)?"open":"over"}
 function fmtLeft(ms){const m=Math.max(0,Math.ceil(ms/6e4)),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?d+"d "+h+"h":h?h+"h "+m%60+"m":m+"m"}
 // Earlier-week gates that were started but never settled (reward or partial XP unclaimed).
 function unsettled(){const cw=weekId(),ws=Object.keys(S.gates);if(S.co&&!ws.includes(S.co.w))ws.push(S.co.w);return ws.filter(w=>{const g=G(w);return w<cw&&g&&g.start&&!g.paid}).sort()}
@@ -324,7 +347,7 @@ function openSpecial(id,b){
   S.sg={id:k.id,r:k.r,s:k.s,start:nowMs(),end:nowMs()+SG_DAYS*864e5,ex:B.ex,t:B.t,p:[0,0,0],run:false,done:false,bx:2*gateBase(k.r)};
   save();render();gateFx("enter",S.sg);
 }
-function sgExpire(){const g=S.sg;if(g&&!g.done&&nowMs()>=g.end){addKey({r:g.r,s:g.s});S.sg=null;save();toast("Special gate expired. Key returned.")}}
+function sgExpire(){const g=S.sg;if(g&&!g.done&&!S.pause&&nowMs()>=g.end){addKey({r:g.r,s:g.s});S.sg=null;save();toast("Special gate expired. Key returned.")}}
 function sgAdd(i,n){
   const g=S.sg;if(!g||g.done||nowMs()>=g.end)return;
   const p0=g.p[i];g.p[i]=Math.max(0,Math.min(g.t[i],p0+n));const d=g.p[i]-p0;histAdd("v",d);
@@ -616,14 +639,15 @@ function tab(t){document.querySelectorAll(".sec").forEach(e=>{e.classList.toggle
 [["today","Quest"],["gate","Gates"],["sum","Summary"],["set","Setup"]].forEach(([t,l])=>{const b=document.createElement("button");b.textContent=l;b.dataset.t=t;b.onclick=()=>tab(t);$("nv").appendChild(b)});
 function render(){
   const r=ri(),nx=T[r+1],cur=T[r];
-  $("rk").textContent=R[r]+(S.plus&&r==6?"+":"");$("sr").textContent=starsText();$("xt").textContent=nx?(S.xp-cur)+" / "+(nx-cur)+" XP to "+R[r+1]:"Max rank";$("xb").style.width=(nx?(S.xp-cur)/(nx-cur)*100:100)+"%";$("sk").textContent="Streak: "+streak()+" days";
+  $("rk").textContent=R[r]+(S.plus&&r==6?"+":"");$("sr").textContent=starsText();$("xt").textContent=nx?(S.xp-cur)+" / "+(nx-cur)+" XP to "+R[r+1]:"Max rank";$("xb").style.width=(nx?(S.xp-cur)/(nx-cur)*100:100)+"%";$("sk").textContent="Streak: "+streak()+" days"+(S.pause?" · Paused":"");
   const d=today(),e=S.days[d]||{},qs=quests(d);
   $("today").innerHTML=(sgActive()?sgHtml():dailyHtml(e))+`
   <div class="w"><h2>This week</h2><div class="mu">${weekDone(weekId())} of 5 quests done this week. Clear 5 by Sunday to qualify for this week's gate, which opens Friday 18:00. Easy quests count. Rest days do not.${r<2?" (unlocks at rank D)":""}.</div></div>`+habitHtml(e)+plusHtml(r)+prestigeHtml(r)+restHtml(e);
   const w=weekId(),n=weekDone(w),st=gateState(w);
   let h=unsettled().slice(0,1).map(uw=>{const u=G(uw);return `<div class="w v"><h2>Last week's gate</h2><div class="mu">${PT[u.p].n} key · rank ${R[u.kr]} · ${u.done?"cleared. Reward waiting.":u.prog+" / "+target(u)+" done. Time is up."}</div><button class="go" style="margin-top:8px" onclick="${u.done?"wheelFx":"claimPartial"}('${uw}')">${u.done?"Claim reward":"Collect partial XP"}</button></div>`}).join("");
   const gs=gateStreak();if(gs>0)h+=`<div class="mu" style="margin:4px 4px 0">Gate streak: <b class="xp">${gs}</b> week${gs>1?"s":""}</div>`;
-  if(st=="locked"){h+=`<div class="w v"><h2>Weekend gate</h2><div class="mu">${r<2?"Reach rank D to unlock gates.":"Clear 5 quests this week ("+n+"/5). Easy quests count. Rest days do not."} Gates open Friday 18:00 and expire Sunday midnight.</div></div>`}
+  if(st=="paused"){h+=`<div class="w v"><h2>Weekend gate</h2><div class="mu">Medical pause. Gates cannot be entered until you resume in Setup. Your gate streak is held.</div></div>`}
+  else if(st=="locked"){h+=`<div class="w v"><h2>Weekend gate</h2><div class="mu">${r<2?"Reach rank D to unlock gates.":"Clear 5 quests this week ("+n+"/5). Easy quests count. Rest days do not."} Gates open Friday 18:00 and expire Sunday midnight.</div></div>`}
   else if(st=="waiting"){h+=`<div class="w v"><h2>Weekend gate</h2><div class="mu"><b>Qualified.</b> ${n} of 5 quest days cleared. Nothing more is needed for the gate. It opens Friday 18:00, in ${fmtLeft(gateOpenMs(w)-nowMs())}, and expires Sunday midnight. Daily quests still hold your streak.</div></div>`}
   else{const g=gateFor(w),t=target(g),open=g.start&&nowMs()<gEnd(g,w),over=g.kr-r>=2,left=fmtLeft(gEnd(g,w)-nowMs());
     h+=`<div class="w ${over?"r":"v"} flame" style="--c:${KC[g.kr]}"><h2>${over?"Out-of-reach gate":"Weekend gate"}${g.coop?" (co-op)":""}</h2><div class="mu"><span class="key" style="background:${PT[g.p].c}"></span>${PT[g.p].n} key · rank ${R[g.kr]}</div><p><b style="font-size:20px">${t} ${PT[g.p].e}</b> ${exInfoBtn(PT[g.p].x)}<br><span class="mu">${over?"Far above your rank. Optional. ":""}Base reward <span class="xp">+${gateXp(g)} XP</span> × wheel (${g.coop?"1.8–3x":"1.5–2.2x"}) · unfinished at expiry pays 70% of base, in proportion to progress · expires Sunday midnight${g.start?"":" ("+left+" left)"} ${g.coop?`<br><span class="mu">Formula: total ${t*2} = your share ${t} + partner's share ${t}. Cleared when your reps reach ${t} and combined reps reach ${t*2}. You earn full XP.</span>`:""} · split it into sets and stop if anything hurts.</span></p>
@@ -633,7 +657,8 @@ function render(){
   const g2=st!="locked"?gateFor(w):null;
   $("gate").insertAdjacentHTML("beforeend",`<div class="w"><h2>Co-op gate</h2><div class="mu">Swap your weekend gate for a shared one. Each of you does half the reps, and and the bonus wheel pays more (1.8x to 3x instead of 1.5x to 2.2x).</div>${g2&&!g2.start?`<p class="mu">Your share code</p><textarea readonly style="height:60px" onclick="this.select()">${code()}</textarea>`:`<p class="mu">Your code appears here once your weekend gate is open and not yet started.</p>`}<p class="mu">Join a friend, or add a key code</p><input id="jc" placeholder="Paste friend's code"><button class="go" style="margin-top:8px" onclick="join()">Join with code</button><div class="mu" style="margin-top:8px">${S.jm||"Paste a friend's code to join their gate or add their key."}</div></div>`);
   $("sum").innerHTML=summaryHtml();
-  $("set").innerHTML=`<div class="w"><h2>Daily window</h2><div class="mu">When can you train? You get a reminder 30 minutes before it opens.</div>${tp2()}<div class="mu" style="margin-top:12px">Window length</div><div class="row" style="justify-content:flex-start;margin-top:6px"><button class="${(S.win.len||2)==1?"go":""}" onclick="setLen(1)">1 hour</button><button class="${(S.win.len||2)==2?"go":""}" onclick="setLen(2)">2 hours</button></div><div class="mu" style="margin-top:8px">Closes at <b style="color:#fff">${endT()}</b></div></div>
+  $("set").innerHTML=`${pauseSetupHtml()}
+  <div class="w"><h2>Daily window</h2><div class="mu">When can you train? You get a reminder 30 minutes before it opens.</div>${tp2()}<div class="mu" style="margin-top:12px">Window length</div><div class="row" style="justify-content:flex-start;margin-top:6px"><button class="${(S.win.len||2)==1?"go":""}" onclick="setLen(1)">1 hour</button><button class="${(S.win.len||2)==2?"go":""}" onclick="setLen(2)">2 hours</button></div><div class="mu" style="margin-top:8px">Closes at <b style="color:#fff">${endT()}</b></div></div>
   <div class="w"><h2>Daily reminder</h2><div class="mu">Do you want a reminder 30 minutes before your window opens?</div><div class="row" style="margin-top:8px;justify-content:flex-start"><button class="${S.rem===1?"go":""}" onclick="remind(1)">Yes</button><button class="${S.rem===0?"go":""}" onclick="remind(0)">No</button></div>${S.rem===1?`<div class="mu" style="margin-top:8px">Reminder file created. If your device did not open it, copy this text into a file named reminder.ics:</div><textarea readonly onclick="this.select()">${ics()}</textarea>`:""}</div>
   <div class="w"><h2>Backup</h2><div class="mu">Export copies your progress as text. Keep it somewhere safe. To restore, paste it here and press Import.</div><textarea id="jx" style="margin-top:8px"></textarea><div class="row" style="justify-content:flex-start;margin-top:8px"><button onclick="expJ()">Export</button><button onclick="impJ()">Import</button></div></div>
   <div class="w"><div class="row" style="justify-content:flex-start;gap:12px"><div style="width:44px;height:44px">${LOGO}</div><div><h2>The System | Fitness Tracker</h2><div class="mu">Offline. No accounts, no network, no tracking. Your data stays on this device. GPL-3.0 licensed.</div></div></div></div>

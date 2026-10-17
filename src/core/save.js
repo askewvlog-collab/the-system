@@ -1,8 +1,8 @@
 // Save format, migrations, validation. A bad import or corrupt save never replaces a good one.
-// v1 = original build. v2 = adds the rank floor (fl). v3 = adds weekly summary records (hist). v4 = adds special keys, pending penalty choice. v5 = adds prestige stars. Add one MIGRATIONS step per version bump,
+// v1 = original build. v2 = adds the rank floor (fl). v3 = adds weekly summary records (hist). v4 = adds special keys, pending penalty choice. v5 = adds prestige stars. v6 = adds medical pause (pause, days.med). Add one MIGRATIONS step per version bump,
 // and add every new state field to sanitize() or it is dropped on load/import.
-const SAVE_VERSION=5;
-const MIGRATIONS={1:o=>({...o,fl:0,v:2}),2:o=>({...o,hist:{},v:3}),3:o=>({...o,keys:[],v:4}),4:o=>({...o,stars:[],v:5})};
+const SAVE_VERSION=6;
+const MIGRATIONS={1:o=>({...o,fl:0,v:2}),2:o=>({...o,hist:{},v:3}),3:o=>({...o,keys:[],v:4}),4:o=>({...o,stars:[],v:5}),5:o=>({...o,v:6})};
 const DATE=/^\d{4}-\d\d-\d\d$/,HM=/^([01]\d|2[0-3]):[0-5]\d$/;
 const isObj=x=>!!x&&typeof x==="object"&&!Array.isArray(x);
 const num=(x,lo,hi,d)=>typeof x==="number"&&isFinite(x)?Math.min(hi,Math.max(lo,x)):d;
@@ -16,7 +16,7 @@ function cleanGate(g){
 function sanitize(o){
   const s=def();s.xp=num(o.xp,0,1e7,0);s.fl=int(o.fl,0,5,0);s.chk=DATE.test(o.chk)?o.chk:null;
   if(isObj(o.days))for(const k of Object.keys(o.days)){const e=o.days[k];if(DATE.test(k)&&isObj(e)){const d={};
-    if(e.p!=null)d.p=int(e.p,0,2,undefined);if(e.p2!=null)d.p2=int(e.p2,0,2,undefined);for(const f of["done","hb","h","rest","sg","c2","done2"])if(e[f]===true)d[f]=true;s.days[k]=d}}
+    if(e.p!=null)d.p=int(e.p,0,2,undefined);if(e.p2!=null)d.p2=int(e.p2,0,2,undefined);for(const f of["done","hb","h","rest","sg","c2","done2","med"])if(e[f]===true)d[f]=true;s.days[k]=d}}
   if(isObj(o.gates))for(const k of Object.keys(o.gates)){const g=cleanGate(o.gates[k]);if(DATE.test(k)&&g)s.gates[k]=g}
   const c=cleanGate(o.co);if(c&&DATE.test(o.co.w)){c.w=o.co.w;s.co=c}
   if(isObj(o.win)){if(HM.test(o.win.s))s.win.s=o.win.s;if(HM.test(o.win.e))s.win.e=o.win.e;s.win.len=int(o.win.len,1,2,2)}
@@ -27,6 +27,7 @@ function sanitize(o){
     if(r>=0&&sd>=0&&Array.isArray(g.ex)&&g.ex.length===3&&g.ex.every(x=>EX[x])&&Array.isArray(g.t)&&Array.isArray(g.p))
       s.sg={id:keyCode({r,s:sd}),r,s:sd,start:num(g.start,0,1e15,0),end:num(g.end,0,1e15,0),ex:g.ex.slice(),t:[0,1,2].map(i=>int(g.t[i],1,9999,1)),p:[0,1,2].map(i=>int(g.p[i],0,9999,0)),run:g.run===true,done:g.done===true,bx:num(g.bx,0,1e6,0)}}
   if(Array.isArray(o.stars))s.stars=o.stars.slice(0,99).filter(isObj).map(x=>({plus:x.plus===true}));
+  if(isObj(o.pause)&&typeof o.pause.t==='number')s.pause={t:num(o.pause.t,0,1e15,0)};
   s.tok=int(o.tok,0,2,0);s.att=int(o.att,0,3,0);
   if(o.rem===0||o.rem===1)s.rem=o.rem;
   for(const f of["plus","sec","tut"])if(o[f]===true)s[f]=true;

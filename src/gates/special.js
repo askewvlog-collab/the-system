@@ -18,7 +18,7 @@ function openSpecial(id,b){
   S.sg={id:k.id,r:k.r,s:k.s,start:nowMs(),end:nowMs()+SG_DAYS*864e5,ex:B.ex,t:B.t,p:[0,0,0],run:false,done:false,bx:2*gateBase(k.r)};
   save();render();gateFx("enter",S.sg);
 }
-function sgExpire(){const g=S.sg;if(g&&!g.done&&nowMs()>=g.end){addKey({r:g.r,s:g.s});S.sg=null;save();toast("Special gate expired. Key returned.")}}
+function sgExpire(){const g=S.sg;if(g&&!g.done&&!S.pause&&nowMs()>=g.end){addKey({r:g.r,s:g.s});S.sg=null;save();toast("Special gate expired. Key returned.")}}
 function sgAdd(i,n){
   const g=S.sg;if(!g||g.done||nowMs()>=g.end)return;
   const p0=g.p[i];g.p[i]=Math.max(0,Math.min(g.t[i],p0+n));const d=g.p[i]-p0;histAdd("v",d);

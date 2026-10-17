@@ -71,6 +71,15 @@ test("special: replaces quests, counts as cleared day, claim once, key consumed"
 test("special: expiry returns the key without penalty",()=>{fresh(500);addKey({r:2,s:5});openSpecial("SK2-5",{dataset:{c:1}});S.off=6;sgExpire();eq(S.sg,null);eq(S.keys.map(k=>k.id),["SK2-5"]);ok(S.xp===500)});
 test("special: only one at a time",()=>{fresh(500);addKey({r:2,s:5});addKey({r:3,s:6});openSpecial("SK2-5",{dataset:{c:1}});openSpecial("SK3-6",{dataset:{c:1}});eq(S.keys.length,1)});
 
+// ---- medical pause
+test("pause: ten paused days cost nothing and hold the streak",()=>{fresh(500);const y=daysAgo(1);clearDay(y);S.chk=daysAgo(10);S.pause={t:nowMs()-10*864e5};penalty();eq(S.xp,500);ok(S.days[daysAgo(5)].med&&S.days[daysAgo(5)].rest);ok(streak()>=1)});
+test("pause: no quests, new gate blocked, banner text",()=>{fresh(500);S.pause={t:nowMs()};pauseMark();render();ok(/Medical pause/.test($("today").textContent));ok(!$("today").querySelector(".q"));eq(gateState(),"paused");openGate();ok(!gateFor(weekId()).start)});
+test("pause: ending it resumes quests today and holds a special gate's timer",()=>{fresh(500);addKey({r:3,s:1});openSpecial("SK3-1",{dataset:{c:1}});const end0=S.sg.end;pauseStart();S.pause.t-=2*864e5;pauseEnd();ok(!S.pause);ok(S.sg.end>=end0+2*864e5-1);ok(!S.days[today()].rest);pick(0);eq(S.days[today()].p,0)});
+test("pause: a special gate does not expire while paused",()=>{fresh(500);addKey({r:2,s:5});openSpecial("SK2-5",{dataset:{c:1}});S.pause={t:nowMs()};S.off=9;sgExpire();ok(S.sg)});
+test("pause: a started gate stays playable",()=>{fresh(120);const g=gateAt(weekId(),{start:nowMs(),end:nowMs()+1e9});S.pause={t:nowMs()};ok(gateState()!=="paused");addProg(5);eq(g.prog,5)});
+test("pause: paused week neither breaks nor adds to the gate streak",()=>{fresh(120);at("2026-10-22T12:00:00");hrec("2026-10-12").g=2;S.days["2026-10-06"]={rest:true,med:true};hrec("2026-09-28").g=2;eq(gateStreak(),2)});
+test("pause: saves round-trip pause and med days",()=>{fresh(120);S.pause={t:12345};S.days["2026-10-10"]={rest:true,med:true};const p=parseSave(JSON.stringify(S));eq(p.pause,{t:12345});ok(p.days["2026-10-10"].med)});
+
 // ---- prestige
 test("prestige: needs rank S, resets, keeps keys, resets attempts, S+ star is cosmetic",()=>{fresh(1000);const b={dataset:{c:1}};prestige(b);eq(S.stars.length,0);fresh(3100);S.sec=true;S.att=3;S.plus=true;addKey({r:4,s:9});prestige(b);eq([S.xp,S.fl,S.att,S.plus],[0,0,0,false]);eq(S.stars,[{plus:true}]);eq(S.keys.length,1);eq(cols(),1)});
 test("prestige: first normal star adds a second column; both must be cleared",async()=>{fresh(3100);prestige({dataset:{c:1}});eq(cols(),2);S.xp=120;raiseFloor();const d=today();pick(0);pick(0,1);finish(0);await wait(700);ok(!dayDone(d));finish(1);await wait(700);ok(dayDone(d))});

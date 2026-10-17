@@ -23,7 +23,7 @@ function gateEndMs(w){const d=new Date(w+"T00:00:00");d.setDate(d.getDate()+7);r
 const gEnd=(g,w)=>g.end||gateEndMs(w);
 const gateEligible=()=>ri()>=2&&weekDone(weekId())>=5;
 // locked: not eligible; waiting: eligible, before Friday 18:00; open: can enter / in progress
-function gateState(w=weekId()){if(!gateEligible())return"locked";if(nowMs()<gateOpenMs(w))return"waiting";return nowMs()<gateEndMs(w)?"open":"over"}
+function gateState(w=weekId()){const g0=G(w);if(S.pause&&!(g0&&g0.start))return"paused";if(!gateEligible())return"locked";if(nowMs()<gateOpenMs(w))return"waiting";return nowMs()<gateEndMs(w)?"open":"over"}
 function fmtLeft(ms){const m=Math.max(0,Math.ceil(ms/6e4)),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?d+"d "+h+"h":h?h+"h "+m%60+"m":m+"m"}
 // Earlier-week gates that were started but never settled (reward or partial XP unclaimed).
 function unsettled(){const cw=weekId(),ws=Object.keys(S.gates);if(S.co&&!ws.includes(S.co.w))ws.push(S.co.w);return ws.filter(w=>{const g=G(w);return w<cw&&g&&g.start&&!g.paid}).sort()}
