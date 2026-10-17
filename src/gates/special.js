@@ -26,6 +26,12 @@ function sgAdd(i,n){
   if(g.p.every((v,j)=>v>=g.t[j])){g.done=true;toast("Special gate cleared. Claim your reward.")}
   save();render();
 }
+// Abandon an unfinished special gate: the key is returned and there is no penalty.
+function sgBail(b){
+  const g=S.sg;if(!g||g.done)return;
+  if(!b.dataset.c){b.dataset.c="1";b.textContent="Tap again: abandon and get the key back";setTimeout(()=>{b.dataset.c="";b.textContent="Abandon gate"},4000);return}
+  addKey({r:g.r,s:g.s});S.sg=null;save();render();toast("Special gate abandoned. Key returned.");
+}
 const sgRun=()=>{const g=S.sg;if(g&&!g.done){g.run=!g.run;save();render()}};
 const sgClaimFx=()=>{if(S.sg&&S.sg.done)gateFx("clear",S.sg,sgClaim)};
 function sgClaim(){
@@ -39,5 +45,5 @@ function sgHtml(){
   const g=S.sg;if(!g)return"";
   const left=fmtLeft(g.end-nowMs());
   const rows=g.ex.map((id,i)=>`<div style="margin-top:10px"><b>${g.p[i]} / ${g.t[i]} ${EX[id].nm}</b> ${exInfoBtn(id)}<div class="bar"><i style="width:${g.p[i]/g.t[i]*100}%"></i></div>${g.done?"":`<div class="row" style="justify-content:flex-start">${[1,5,10].map(k=>`<button onclick="sgAdd(${i},${k})">+${k}</button>`).join("")}${[1,5].map(k=>`<button onclick="sgAdd(${i},-${k})">−${k}</button>`).join("")}</div>`}</div>`).join("");
-  return `<div class="w v flame" style="--c:${KC[g.r]}"><h2>Special gate · rank ${KEYRANK[g.r]}</h2><div class="mu">${g.done?"Cleared.":left+" left. Replaces your daily quests. Each day with progress counts as a cleared day."} Reward <span class="xp">+${sgXp(g)} XP</span> and a rest token${g.run?"":" (+20% XP with the optional run)"}. Split into sets. Stop if anything hurts.</div>${rows}${g.done?`<button class="go" style="margin-top:12px" onclick="sgClaimFx()">Claim reward</button><div class="mu" style="margin-top:8px">Result code: ${sgResult(g)}</div>`:`<button style="margin-top:12px" class="${g.run?"go":""}" onclick="sgRun()">${g.run?"Run logged (10 min)":"Optional: log a 10-minute run"}</button>`}</div>`;
+  return `<div class="w v flame" style="--c:${KC[g.r]}"><h2>Special gate · rank ${KEYRANK[g.r]}</h2><div class="mu">${g.done?"Cleared.":left+" left. Replaces your daily quests. Each day with progress counts as a cleared day."} Reward <span class="xp">+${sgXp(g)} XP</span> and a rest token${g.run?"":" (+20% XP with the optional run)"}. Split into sets. Stop if anything hurts.</div>${rows}${g.done?`<button class="go" style="margin-top:12px" onclick="sgClaimFx()">Claim reward</button><div class="mu" style="margin-top:8px">Result code: ${sgResult(g)}</div>`:`<button style="margin-top:12px" class="${g.run?"go":""}" onclick="sgRun()">${g.run?"Run logged (10 min)":"Optional: log a 10-minute run"}</button> <button style="margin-top:12px" onclick="sgBail(this)">Abandon gate</button>`}</div>`;
 }

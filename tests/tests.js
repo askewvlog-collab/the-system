@@ -69,6 +69,8 @@ test("key: same code builds the same gate; lower rank gets bigger targets",()=>{
 test("key: wheel key is rank +1 and duplicates are ignored",()=>{fresh(120);const k=newKey();eq(k.r,3);ok(addKey(k));ok(!addKey(k))});
 test("special: replaces quests, counts as cleared day, claim once, key consumed",()=>{fresh(500);addKey({r:3,s:1});openSpecial("SK3-1",{dataset:{c:1}});eq(S.keys.length,0);ok(sgActive());sgAdd(0,1);ok(dayDone(today()));for(let i=0;i<3;i++)sgAdd(i,9999);ok(S.sg.done&&!sgActive());const x=S.xp,exp=sgXp(S.sg);sgClaim();sgClaim();eq(S.xp-x,exp);eq(S.sg,null);eq(S.tok,1)});
 test("special: expiry returns the key without penalty",()=>{fresh(500);addKey({r:2,s:5});openSpecial("SK2-5",{dataset:{c:1}});S.off=6;sgExpire();eq(S.sg,null);eq(S.keys.map(k=>k.id),["SK2-5"]);ok(S.xp===500)});
+test("special: abandoning returns the key, loses progress, no penalty, daily quests return",()=>{fresh(500);addKey({r:3,s:1});openSpecial("SK3-1",{dataset:{c:1}});sgAdd(0,3);const b={dataset:{},textContent:"Abandon gate"};sgBail(b);ok(S.sg,"first tap only confirms");sgBail(b);eq(S.sg,null);eq(S.keys.map(k=>k.id),["SK3-1"]);eq(S.xp,500);ok(!sgActive());render();ok($("today").querySelector(".q"))});
+test("special: a cleared special gate cannot be abandoned",()=>{fresh(500);addKey({r:3,s:1});openSpecial("SK3-1",{dataset:{c:1}});for(let i=0;i<3;i++)sgAdd(i,9999);sgBail({dataset:{c:1}});ok(S.sg&&S.sg.done)});
 test("special: only one at a time",()=>{fresh(500);addKey({r:2,s:5});addKey({r:3,s:6});openSpecial("SK2-5",{dataset:{c:1}});openSpecial("SK3-6",{dataset:{c:1}});eq(S.keys.length,1)});
 
 // ---- medical pause
