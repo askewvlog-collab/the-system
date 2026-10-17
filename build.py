@@ -18,6 +18,12 @@ html = f"""<!DOCTYPE html>
 <meta name="description" content="The System | Fitness Tracker: an offline fitness quest game. No accounts, no network.">
 <meta name="theme-color" content="#030207">
 <link rel="icon" href="{icon}">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="The System">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 {read("ui/styles.css")}{read("ui/flame.css")}{read("exercises/exercises.css")}{read("tutorial/tutorial.css")}{read("gates/keys.css")}{read("gates/fx.css")}{read("prestige/prestige.css")}</style></head><body>
 {read("ui/template.html").rstrip()}
@@ -25,6 +31,8 @@ html = f"""<!DOCTYPE html>
 {js}</script></body></html>
 """
 (R / "index.html").write_text(html, encoding="utf-8")
+import hashlib
+(R / "sw.js").write_text((R / "pwa" / "sw.template.js").read_text(encoding="utf-8").replace("__VERSION__", hashlib.sha1(html.encode("utf-8")).hexdigest()[:10]), encoding="utf-8")
 print("index.html", len(html), "bytes")
 
 # Test runner page: the same app plus tests/tests.js, with localStorage stubbed so no real save is touched.

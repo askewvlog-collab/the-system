@@ -6,6 +6,12 @@
 <meta name="description" content="The System | Fitness Tracker: an offline fitness quest game. No accounts, no network.">
 <meta name="theme-color" content="#030207">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%23030207%22/%3E%3Cpath%20d%3D%22M14%209h36v46H14z%22%20fill%3D%22none%22%20stroke%3D%22%23a07bff%22%20stroke-width%3D%223%22/%3E%3Cpath%20d%3D%22M32%209v46%22%20stroke%3D%22%235cc8ff%22%20stroke-width%3D%222.5%22/%3E%3Cpath%20d%3D%22M14%209l18%2012M50%209L32%2021M14%2055l18-12M50%2055L32%2043%22%20fill%3D%22none%22%20stroke%3D%22%23a07bff%22%20stroke-width%3D%222%22%20opacity%3D%22.7%22/%3E%3Cpath%20d%3D%22M8%204v8M4%208h8M56%2060v-8M60%2056h-8%22%20stroke%3D%22%235cc8ff%22%20stroke-width%3D%222%22/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="The System">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 :root{--bg:#030207;--pan:#0a0818d9;--ln:#5cc8ff;--mu:#8f93bd;--tx:#e6eaff;--vi:#a07bff;--rd:#ff4a3d;--ye:#ffd23d;--ok:#3ddc97;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}html,body{margin:0}
@@ -636,4 +642,6 @@ function tp2(){const[h,m]=S.win.s.split(":").map(Number),h12=h%12||12;const sel=
 // Boot
 S=loadSave();sgExpire();penalty();pendShow();tab("today");if(loadNote)toast(loadNote);
 if(!S.tut)tutStart();
+// Offline support for the hosted/installed app (http/https only; not in the dev or test pages).
+if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)&&!window.__SAVEKEY&&!window.__noFx)navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script></body></html>

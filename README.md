@@ -18,6 +18,8 @@ An Android version (APK) is planned, so it can run as an installed app. It is no
 
 Open `index.html` in a browser, or host the folder (for example on GitHub Pages). Nothing else is needed.
 
+**Install on your phone (PWA).** Open the hosted page in Chrome on Android (or Safari on iPhone), then choose "Install app" / "Add to Home Screen". It then runs fullscreen and works offline. Your progress is stored on that device, so use Setup, Backup to export a copy now and then.
+
 ## Develop
 
 Source lives in `src/`, one folder per feature (`core`, `ranks`, `quests`, `gates`, `prestige`, `summaries`, `tutorial`, `exercises`, `ui`). Requires only Python 3.
