@@ -1,5 +1,7 @@
 # The System | Fitness Tracker
 
+<p align="center"><img src="docs/gameplay.gif" width="300" alt="The System: daily quests, a gate opening, the shatter on clear, the reward wheel"></p>
+
 **Play it: https://askewvlog-collab.github.io/the-system/**
 
 A free, offline fitness quest game. You get daily quests, earn XP, climb ranks (EE to S), clear weekly gates, and win rare keys to special gates. A cold, formal "System" keeps score. It never judges you: easy quests keep your streak alive, and rank floors stop you from falling far.
@@ -46,7 +48,7 @@ An Android version (APK) is planned, so it can run as an installed app. It is no
 python3 build.py        # writes index.html, sw.js and tests/runner.html
 ```
 
-Open `tests/runner.html` in a browser to run the regression tests (the result appears on the page); they should pass before you contribute. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Open `tests/runner.html` in a browser to run the regression tests (the result appears on the page); they should pass before you contribute. See [CONTRIBUTING.md](CONTRIBUTING.md). Project notes for AI-assisted work live in [`docs/`](docs/).
 
 To change the secret-rank key, run `python3 tools/hashkey.py NEWWORD` and paste the number into `SECRET_HASH` in `src/prestige/secret.js`.
 
