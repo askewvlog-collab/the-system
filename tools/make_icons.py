@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Draw the PWA icons with Pillow (original, code-drawn): an arched gate with a glowing seam of light.
+"""Draw the PWA icons with Pillow (original, code-drawn): an arched gate with a glowing seam of light, no extra ornaments.
 Output: icon-192.png, icon-512.png, icon-maskable-512.png. Geometry matches src/ui/logo.svg."""
 import math
 from PIL import Image, ImageDraw, ImageFilter, ImageChops
@@ -35,9 +35,6 @@ def render(size, scale=1.0, SS=3):
     # glowing seam of light, widest at the base
     for d, w0 in ((gd, 6), (sd, 2.2)):
         d.line([P((32, 11)), P((32, 56))], fill=ICE if d is gd else WHITE, width=W(w0))
-    for d in (gd, sd):  # System-window corner brackets
-        for a, b in [((4, 4), (4, 12)), ((4, 4), (12, 4)), ((60, 60), (60, 52)), ((60, 60), (52, 60))]:
-            d.line([P(a), P(b)], fill=ICE, width=W(1.8))
     img = ImageChops.add(bg, glow.filter(ImageFilter.GaussianBlur(n * .018)))
     img = ImageChops.add(img, sharp)
     return img.resize((size, size), Image.LANCZOS)
