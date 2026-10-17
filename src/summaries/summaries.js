@@ -13,7 +13,7 @@ const sumSet=v=>{sumView=v;render()};
 const wkLabel=w=>new Date(w+"T12:00:00").toLocaleDateString(undefined,{month:"short",day:"numeric"});
 function sumLine(r,extra){
   const bp=PT.map((p,i)=>p.n+" "+r.bp[i]).join(" · ");
-  return `<div class="mu">Cleared days: <b>${r.c}</b> · Best streak: <b>${r.st}</b> · XP: <b class="xp">+${r.xp}</b>${r.xl?" (−"+r.xl+" penalties)":""}<br>${extra}<br>Volume: <b>${r.v}</b> reps<br>Quests by body part: ${bp}</div>`;
+  return `<div class="mu">Cleared days: <b>${r.c}</b> · Best streak: <b>${r.st}</b> · XP: <b class="xp">+${r.xp}</b>${r.xl?" (−"+r.xl+" penalties)":""}<br>${extra}<br>Total reps: <b>${r.v}</b><br>Quests by body part: ${bp}</div>`;
 }
 function summaryHtml(){
   const h=S.hist||{},ws=Object.keys(h).sort().reverse();
