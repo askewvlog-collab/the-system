@@ -10,6 +10,10 @@ A free, offline fitness quest game. You get daily quests, earn XP, climb ranks (
 
 Daily quests (easy / medium / hard, sized per exercise) with a weekly habit, rest tokens, rank floors, a Friday-to-Sunday weekly gate with a reward wheel, co-op gates with a friend's code, special keys and compound special gates, prestige stars, weekly and monthly summaries, and a first-open tutorial. Gate entry and clear sequences are drawn in code.
 
+## Roadmap
+
+An Android version (APK) is planned, so it can run as an installed app. It is not available yet. It will stay offline with no accounts or tracking. Health Connect step bonuses, classes and friend comparison are ideas for later.
+
 ## Use it
 
 Open `index.html` in a browser, or host the folder (for example on GitHub Pages). Nothing else is needed.
