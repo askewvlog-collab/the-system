@@ -90,6 +90,9 @@ test("prestige: reaching S on a new run replays the discovery sequence",()=>{fre
 test("prestige: columns cap at two",()=>{fresh();S.stars=[{plus:false},{plus:false},{plus:true}];eq(cols(),2)});
 test("secret: key field only at rank S after discovery; 3 attempts lock",()=>{fresh(3100);S.sec=true;render();ok($("pk"));S.att=3;render();ok(!$("pk"));ok(/sealed/.test($("today").textContent))});
 
+// ---- tutorial
+test("tutorial: four screens covering quests, XP, floors, rest, gates, co-op; ends on today's quest; shown once",()=>{eq(TUT.length,4);const all=TUT.map(t=>t[1]).join(" ").toLowerCase();["quest","xp","floor","rest token","gate","co-op"].forEach(k=>ok(all.includes(k),k));ok(/select today's quest/i.test(TUT[3][1]));fresh();tutStart();for(let i=0;i<3;i++)tutNext();eq($("tn").textContent,"Begin");tutNext();ok(!$("tut").classList.contains("on"));ok(S.tut)});
+
 // ---- runner
 (async()=>{
   const out=[];let pass=0;const fails=[];
