@@ -12,6 +12,7 @@ function render(){
   <div class="w"><h2>This week</h2><div class="mu">${weekDone(weekId())} of 5 quests done this week. Clear 5 by Sunday to qualify for this week's gate, which opens Friday 18:00. Easy quests count. Rest days do not.${r<2?" (unlocks at rank D)":""}.</div></div>`+habitHtml(e)+plusHtml(r)+prestigeHtml(r)+restHtml(e);
   const w=weekId(),n=weekDone(w),st=gateState(w);
   let h=unsettled().slice(0,1).map(uw=>{const u=G(uw);return `<div class="w v"><h2>Last week's gate</h2><div class="mu">${PT[u.p].n} key · rank ${R[u.kr]} · ${u.done?"cleared. Reward waiting.":u.prog+" / "+target(u)+" done. Time is up."}</div><button class="go" style="margin-top:8px" onclick="${u.done?"wheelFx":"claimPartial"}('${uw}')">${u.done?"Claim reward":"Collect partial XP"}</button></div>`}).join("");
+  const gs=gateStreak();if(gs>0)h+=`<div class="mu" style="margin:4px 4px 0">Gate streak: <b class="xp">${gs}</b> week${gs>1?"s":""}</div>`;
   if(st=="locked"){h+=`<div class="w v"><h2>Weekend gate</h2><div class="mu">${r<2?"Reach rank D to unlock gates.":"Clear 5 quests this week ("+n+"/5). Easy quests count. Rest days do not."} Gates open Friday 18:00 and expire Sunday midnight.</div></div>`}
   else if(st=="waiting"){h+=`<div class="w v"><h2>Weekend gate</h2><div class="mu">Eligible (${n}/5 quests cleared). Opens Friday 18:00, in ${fmtLeft(gateOpenMs(w)-nowMs())}. Expires Sunday midnight.</div></div>`}
   else{const g=gateFor(w),t=target(g),open=g.start&&nowMs()<gEnd(g,w),over=g.kr-r>=2,left=fmtLeft(gEnd(g,w)-nowMs());

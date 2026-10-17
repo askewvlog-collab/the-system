@@ -37,6 +37,9 @@ test("gate: no progress after expiry",()=>{fresh(120);at("2026-10-17T12:00:00");
 test("gate: previous week's unfinished gate pays partial XP once",()=>{fresh(120);at("2026-10-20T12:00:00");const g=gateAt("2026-10-12",{start:1,end:2,prog:20,bx:90});eq(unsettled(),["2026-10-12"]);const x=S.xp,exp=gatePartialXp(g);claimPartial("2026-10-12");claimPartial("2026-10-12");eq(S.xp-x,exp);eq(unsettled(),[])});
 test("gate: progress never goes below zero or above the target",()=>{fresh(120);const g=gateAt(weekId(),{start:nowMs(),end:nowMs()+1e9});addProg(-50);eq(g.prog,0);addProg(99999);eq(g.prog,target(g));ok(g.done)});
 
+test("gate streak: counts consecutive cleared weeks, current week never breaks it",()=>{fresh(120);at("2026-10-22T12:00:00");eq(weekId(),"2026-10-19");eq(gateStreak(),0);hrec("2026-10-19").g=2;eq(gateStreak(),1,"current week cleared");hrec("2026-10-12").g=2;hrec("2026-10-05").g=2;eq(gateStreak(),3);delete S.hist["2026-10-19"];eq(gateStreak(),2,"current week not cleared yet");hrec("2026-10-12").g=1;eq(gateStreak(),0,"partial last week breaks it")});
+test("gate streak: a missing past week breaks it",()=>{fresh(120);at("2026-10-22T12:00:00");hrec("2026-10-12").g=2;hrec("2026-09-28").g=2;eq(gateStreak(),1)});
+
 // ---- reward claims
 test("reward: quest XP shown equals awarded, claimed once",async()=>{fresh(120);const q=quests(today())[1];pick(1);const x=S.xp;finish();finish();eq(S.xp-x,q.xp);await wait(700)});
 test("reward: easy quest is 1-2 reps and exactly 1 XP at every rank",()=>{for(let r=0;r<7;r++){fresh(T[r]);for(let d=0;d<30;d++)quests("2026-11-"+String(d+1).padStart(2,"0")).filter(q=>q.t==0).forEach(q=>{eq(q.xp,1);ok(q.amt>=1&&q.amt<=2)})}});

@@ -27,6 +27,20 @@ function gateState(w=weekId()){if(!gateEligible())return"locked";if(nowMs()<gate
 function fmtLeft(ms){const m=Math.max(0,Math.ceil(ms/6e4)),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?d+"d "+h+"h":h?h+"h "+m%60+"m":m+"m"}
 // Earlier-week gates that were started but never settled (reward or partial XP unclaimed).
 function unsettled(){const cw=weekId(),ws=Object.keys(S.gates);if(S.co&&!ws.includes(S.co.w))ws.push(S.co.w);return ws.filter(w=>{const g=G(w);return w<cw&&g&&g.start&&!g.paid}).sort()}
+// Gate streak: consecutive weeks with a cleared weekly gate. A week with medical-pause days neither adds nor breaks it,
+// and the current week never breaks it (it may still be cleared).
+const prevWeek=w=>ds(new Date(new Date(w+"T12:00:00").getTime()-7*864e5));
+function weekPaused(w){const d=new Date(w+"T12:00:00");for(let i=0;i<7;i++){const e=S.days[ds(d)];if(e&&e.med)return true;d.setDate(d.getDate()+1)}return false}
+function gateStreak(){
+  let w=weekId(),n=0;
+  for(let i=0;i<520;i++){
+    const r=S.hist&&S.hist[w];
+    if(r&&r.g==2)n++;
+    else if(i>0&&!weekPaused(w))break;
+    w=prevWeek(w);
+  }
+  return n;
+}
 function code(){const g=gateFor(weekId());return btoa(JSON.stringify({p:g.p,kr:g.kr}))}
 function join(){const v=$("jc").value.trim(),k=parseKey(v);if(k){S.jm=addKey(k)?"Key added: rank "+KEYRANK[k.r]+". See Special gates.":"You already hold that key.";save();render();return}try{const c=JSON.parse(atob(v));if(!(c.p>=0&&c.p<=3&&c.kr>=0&&c.kr<=6))throw 0;S.co={w:weekId(),p:c.p,kr:Math.min(c.kr,ri()),start:null,prog:0,done:false,coop:true,paid:false};S.jm="Joined: "+PT[c.p].n+" co-op gate. It appears on the Gates tab when your weekend gate is open.";save();render()}catch(e){S.jm="That code is not valid.";render()}}
 function leaveCo(){if(S.co&&S.co.start)return;S.co=null;save();render()} // only before the gate is started
