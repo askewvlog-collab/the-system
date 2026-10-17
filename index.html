@@ -5,7 +5,7 @@
 <title>The System | Fitness Tracker</title>
 <meta name="description" content="The System | Fitness Tracker: an offline fitness quest game. No accounts, no network.">
 <meta name="theme-color" content="#030207">
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%23030207%22/%3E%3Cpath%20d%3D%22M14%209h36v46H14z%22%20fill%3D%22none%22%20stroke%3D%22%23a07bff%22%20stroke-width%3D%223%22/%3E%3Cpath%20d%3D%22M32%209v46%22%20stroke%3D%22%235cc8ff%22%20stroke-width%3D%222.5%22/%3E%3Cpath%20d%3D%22M14%209l18%2012M50%209L32%2021M14%2055l18-12M50%2055L32%2043%22%20fill%3D%22none%22%20stroke%3D%22%23a07bff%22%20stroke-width%3D%222%22%20opacity%3D%22.7%22/%3E%3Cpath%20d%3D%22M8%204v8M4%208h8M56%2060v-8M60%2056h-8%22%20stroke%3D%22%235cc8ff%22%20stroke-width%3D%222%22/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%23030207%22/%3E%3Cpath%20d%3D%22M14%2056V28A18%2018%200%200%201%2050%2028V56%22%20fill%3D%22none%22%20stroke%3D%22%23a07bff%22%20stroke-width%3D%223%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M20%2056V29A12%2012%200%200%201%2044%2029V56%22%20fill%3D%22none%22%20stroke%3D%22%235cc8ff%22%20stroke-width%3D%221.6%22%20opacity%3D%22.6%22/%3E%3Cpath%20d%3D%22M32%2011V56%22%20stroke%3D%22%23e6f5ff%22%20stroke-width%3D%222.4%22/%3E%3Cpath%20d%3D%22M4%2012V4h8M60%2052v8h-8%22%20fill%3D%22none%22%20stroke%3D%22%235cc8ff%22%20stroke-width%3D%222%22/%3E%3C/svg%3E">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -84,7 +84,7 @@ nav button{flex:1;border:0;background:none;color:var(--mu);padding:15px 4px}nav 
 <div id="fxw" aria-hidden="true"><canvas id="fx"></canvas><div id="fxs" class="mu">Tap to skip</div></div>
 <div id="ov"><div><div class="mu" id="ot"></div><div class="rk" id="or"></div><p id="om"></p><button class="go" onclick="ov.classList.remove('on')">Continue</button></div></div>
 <script>
-const LOGO="<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect width=\"64\" height=\"64\" fill=\"#030207\"/><path d=\"M14 9h36v46H14z\" fill=\"none\" stroke=\"#a07bff\" stroke-width=\"3\"/><path d=\"M32 9v46\" stroke=\"#5cc8ff\" stroke-width=\"2.5\"/><path d=\"M14 9l18 12M50 9L32 21M14 55l18-12M50 55L32 43\" fill=\"none\" stroke=\"#a07bff\" stroke-width=\"2\" opacity=\".7\"/><path d=\"M8 4v8M4 8h8M56 60v-8M60 56h-8\" stroke=\"#5cc8ff\" stroke-width=\"2\"/></svg>";
+const LOGO="<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect width=\"64\" height=\"64\" fill=\"#030207\"/><path d=\"M14 56V28A18 18 0 0 1 50 28V56\" fill=\"none\" stroke=\"#a07bff\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M20 56V29A12 12 0 0 1 44 29V56\" fill=\"none\" stroke=\"#5cc8ff\" stroke-width=\"1.6\" opacity=\".6\"/><path d=\"M32 11V56\" stroke=\"#e6f5ff\" stroke-width=\"2.4\"/><path d=\"M4 12V4h8M60 52v8h-8\" fill=\"none\" stroke=\"#5cc8ff\" stroke-width=\"2\"/></svg>";
 // State, save/load, dates, seeded random.
 const $=id=>document.getElementById(id);
 const def=()=>({v:SAVE_VERSION,xp:0,fl:0,chk:null,days:{},gates:{},hist:{},keys:[],stars:[],win:{s:"17:00",e:"19:00"}});

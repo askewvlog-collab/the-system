@@ -6,6 +6,12 @@ A free, offline fitness quest game. You get daily quests, earn XP, climb ranks (
 - **Honor system.** Nothing is verified. It is a motivating game, not a tracker.
 - **Safe to try.** Stop if anything hurts. Every exercise has an info panel with form cues and an easier variation.
 
+## How it was made
+
+The System is a **vibe-managed creation**: one person with an idea and a lot of taste-testing, building alongside an AI pair-programmer. The concept, the rules and the voice are human. The code, the stick-figure exercise diagrams and the gate animations were written in conversation, drawn in code, and checked by playing the thing.
+
+That is also why some parts are honest placeholders. The icon and the visual identity are a first pass, drawn programmatically. If the project grows, the plan is to bring in real artists for the icon, the branding and the gate art. Until then it stays small, dark and fully original: no borrowed art, no accounts, no tracking.
+
 ## Features
 
 Daily quests (easy / medium / hard, sized per exercise) with a weekly habit, rest tokens, rank floors, a Friday-to-Sunday weekly gate with a reward wheel, co-op gates with a friend's code, special keys and compound special gates, prestige stars, weekly and monthly summaries, and a first-open tutorial. Gate entry and clear sequences are drawn in code.

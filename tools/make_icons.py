@@ -1,22 +1,47 @@
 #!/usr/bin/env python3
-"""Draw the PWA icons (same geometry as src/ui/logo.svg) with Pillow. Output: icon-192.png, icon-512.png, icon-maskable-512.png."""
-from PIL import Image, ImageDraw
-BG, VI, ICE = (3, 2, 7), (160, 123, 255), (92, 200, 255)
-def draw(size, scale=1.0, SS=4):
+"""Draw the PWA icons with Pillow (original, code-drawn): an arched gate with a glowing seam of light.
+Output: icon-192.png, icon-512.png, icon-maskable-512.png. Geometry matches src/ui/logo.svg."""
+import math
+from PIL import Image, ImageDraw, ImageFilter, ImageChops
+BG, VI, ICE, WHITE = (3, 2, 7), (160, 123, 255), (92, 200, 255), (230, 245, 255)
+
+def arch(): # outer gate outline, 64-unit canvas
+    pts = [(14, 56), (14, 28)] + [(32 + 18 * math.cos(math.radians(a)), 28 + 18 * math.sin(math.radians(a))) for a in range(180, 361, 6)] + [(50, 28), (50, 56)]
+    return pts
+def inner():
+    return [(20, 56), (20, 29)] + [(32 + 12 * math.cos(math.radians(a)), 29 + 12 * math.sin(math.radians(a))) for a in range(180, 361, 6)] + [(44, 29), (44, 56)]
+
+def render(size, scale=1.0, SS=3):
     n = size * SS
-    im = Image.new("RGB", (n, n), BG)
-    d = ImageDraw.Draw(im)
-    u = n / 64 * scale
-    o = n * (1 - scale) / 2
-    P = lambda x, y: (o + x * u, o + y * u)
-    d.rectangle([*P(14, 9), *P(50, 55)], outline=VI, width=max(1, round(3 * u)))
-    dim = tuple(int(c * .7 + b * .3) for c, b in zip(VI, BG))
-    for a, b in [((14, 9), (32, 21)), ((50, 9), (32, 21)), ((14, 55), (32, 43)), ((50, 55), (32, 43))]:
-        d.line([P(*a), P(*b)], fill=dim, width=max(1, round(2 * u)))
-    d.line([P(32, 9), P(32, 55)], fill=ICE, width=max(1, round(2.5 * u)))
-    for a, b in [((8, 4), (8, 12)), ((4, 8), (12, 8)), ((56, 60), (56, 52)), ((60, 56), (52, 56))]:
-        d.line([P(*a), P(*b)], fill=ICE, width=max(1, round(2 * u)))
-    return im.resize((size, size), Image.LANCZOS)
-draw(192).save("icon-192.png")
-draw(512).save("icon-512.png")
-draw(512, .62).save("icon-maskable-512.png")  # content inside the maskable safe zone
+    u = n / 64 * scale; o = n * (1 - scale) / 2
+    P = lambda p: (o + p[0] * u, o + p[1] * u)
+    W = lambda w: max(1, round(w * u))
+    # background: soft violet bloom behind the gate
+    bg = Image.new("RGB", (n, n), BG)
+    bloom = Image.new("RGB", (n, n), (0, 0, 0))
+    ImageDraw.Draw(bloom).ellipse([P((6, 6)), P((58, 62))], fill=(58, 30, 130))
+    bg = ImageChops.add(bg, bloom.filter(ImageFilter.GaussianBlur(n * .11)))
+    # light cast on the floor in front of the gate
+    floor = Image.new("RGB", (n, n), (0, 0, 0))
+    ImageDraw.Draw(floor).polygon([P((32, 55)), P((10, 63)), P((54, 63))], fill=(40, 90, 130))
+    bg = ImageChops.add(bg, floor.filter(ImageFilter.GaussianBlur(n * .02)))
+    glow = Image.new("RGB", (n, n), (0, 0, 0)); gd = ImageDraw.Draw(glow)
+    sharp = Image.new("RGB", (n, n), (0, 0, 0)); sd = ImageDraw.Draw(sharp)
+    for d, wd in ((gd, 5), (sd, 2.6)):
+        d.line([P(p) for p in arch()], fill=VI, width=W(wd), joint="curve")
+    for d, wd in ((gd, 3), (sd, 1.2)):
+        dim = tuple(int(c * .55) for c in ICE)
+        d.line([P(p) for p in inner()], fill=dim, width=W(wd), joint="curve")
+    # glowing seam of light, widest at the base
+    for d, w0 in ((gd, 6), (sd, 2.2)):
+        d.line([P((32, 11)), P((32, 56))], fill=ICE if d is gd else WHITE, width=W(w0))
+    for d in (gd, sd):  # System-window corner brackets
+        for a, b in [((4, 4), (4, 12)), ((4, 4), (12, 4)), ((60, 60), (60, 52)), ((60, 60), (52, 60))]:
+            d.line([P(a), P(b)], fill=ICE, width=W(1.8))
+    img = ImageChops.add(bg, glow.filter(ImageFilter.GaussianBlur(n * .018)))
+    img = ImageChops.add(img, sharp)
+    return img.resize((size, size), Image.LANCZOS)
+
+render(192).save("icon-192.png")
+render(512).save("icon-512.png")
+render(512, .68).save("icon-maskable-512.png")  # content inside the maskable safe zone
