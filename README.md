@@ -4,6 +4,14 @@
 
 A free, offline fitness quest game. You get daily quests, earn XP, climb ranks (EE to S), clear weekly gates, and win rare keys to special gates. A cold, formal "System" keeps score. It never judges you: easy quests keep your streak alive, and rank floors stop you from falling far.
 
+## Screenshots
+
+<p>
+<img src="docs/screenshots/quests.jpg" width="19%" alt="Daily quests"> <img src="docs/screenshots/gate.jpg" width="19%" alt="Weekly gate"> <img src="docs/screenshots/gate-entry.jpg" width="19%" alt="Gate entry animation"> <img src="docs/screenshots/wheel.jpg" width="19%" alt="Reward wheel with odds"> <img src="docs/screenshots/secret-rank.jpg" width="19%" alt="A secret awaits beyond S">
+</p>
+
+Daily quests with exercise info, the weekly gate, the gate-entry scene (all drawn in code), the reward wheel with its odds, and a hint that something exists beyond S. Finding it is up to you.
+
 ## Install on your phone
 
 Open the link above in Chrome on Android (or Safari on iPhone) and choose **Install app** / **Add to Home Screen**. It runs fullscreen and works offline. On a computer, just open the link, or download `index.html` and open it.
