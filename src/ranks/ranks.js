@@ -10,20 +10,22 @@ function loseXp(n){const min=T[floorIdx()],l=Math.max(0,Math.min(n,S.xp-min));S.
 function penalty(){
   sgExpire();raiseFloor();pauseMark();const t=today();if(!S.chk){S.chk=t;save();return}
   // One ordinary missed-day penalty per return, however long the absence.
-  let d=new Date(S.chk+"T12:00:00"),missed=0,n=0;
-  while(ds(d)<t&&n<400){if(!dayDone(ds(d))&&!(S.days[ds(d)]&&S.days[ds(d)].rest))missed++;d.setDate(d.getDate()+1);n++}
+  let d=new Date(S.chk+"T12:00:00"),missed=0,n=0,why="";
+  while(ds(d)<t&&n<400){if(!dayDone(ds(d))&&!(S.days[ds(d)]&&S.days[ds(d)].rest)){missed++;why=missReason(ds(d))}d.setDate(d.getDate()+1);n++}
   S.chk=t;
   if(missed&&!S.pend){
     const amt=2+ri()*2,loss=Math.min(amt,S.xp-T[floorIdx()]);
-    if(loss>0&&(S.tok||0)>0){S.pend={n:amt,m:missed};save();pendShow();return} // player chooses: spend a token or lose the XP
-    if(loss>0)applyPenalty(amt,missed);
+    if(loss>0&&(S.tok||0)>0){S.pend={n:amt,m:missed,w:why};save();pendShow();return} // player chooses: spend a token or lose the XP
+    if(loss>0)applyPenalty(amt,missed,why);
   }
   save();
 }
-function applyPenalty(n,missed){const lost=loseXp(n);if(!lost)return;histAdd("xl",lost);save();banner("Penalty","−"+lost+" XP",missed>1?"You were absent "+missed+" days. One penalty applied.":"You missed a day. Quests cost XP when skipped.")}
+// Why a day did not count, in plain words.
+function missReason(k){const e=S.days[k];if(!e||!(e.done||e.sg))return"no quest was cleared";if(e.hb&&!e.h)return"the quest was cleared but the weekly habit was not";if(e.c2&&!e.done2)return"the first quest was cleared but the second was not";return""}
+function applyPenalty(n,missed,why){const lost=loseXp(n);if(!lost)return;histAdd("xl",lost);save();banner("Penalty","−"+lost+" XP",missed>1?"You were absent "+missed+" days. One penalty applied.":why&&missed==1?"Day not cleared: "+why+". Quests cost XP when skipped.":"You missed a day. Quests cost XP when skipped.")}
 // Return after missed days with a token in hand: spend it to lose no XP, or lose the XP and keep the token.
-function pendShow(){const p=S.pend;if(!p)return;const loss=Math.max(0,Math.min(p.n,S.xp-T[floorIdx()]));$("pnm").textContent=(p.m>1?"You were absent "+p.m+" days. ":"You missed a day. ")+"One penalty applies: −"+loss+" XP. Spend a rest token (you have "+(S.tok||0)+") to lose nothing, or accept the loss and keep the token.";$("pn").classList.add("on")}
-function pendResolve(spend){const p=S.pend;if(!p)return;S.pend=null;$("pn").classList.remove("on");if(spend&&(S.tok||0)>0){S.tok--;save();toast("Rest token spent. No XP lost.")}else applyPenalty(p.n,p.m);save();render()}
+function pendShow(){const p=S.pend;if(!p)return;const loss=Math.max(0,Math.min(p.n,S.xp-T[floorIdx()]));$("pnm").textContent=(p.m>1?"You were absent "+p.m+" days. ":p.w?"Day not cleared: "+p.w+". ":"You missed a day. ")+"One penalty applies: −"+loss+" XP. Spend a rest token (you have "+(S.tok||0)+") to lose nothing, or accept the loss and keep the token.";$("pn").classList.add("on")}
+function pendResolve(spend){const p=S.pend;if(!p)return;S.pend=null;$("pn").classList.remove("on");if(spend&&(S.tok||0)>0){S.tok--;save();toast("Rest token spent. No XP lost.")}else applyPenalty(p.n,p.m,p.w);save();render()}
 // Applies XP at once (so a closed app never loses a claimed reward). defer=true postpones the banner: call announce(result) later.
 function gain(x,defer){const b=ri();S.xp+=x;histAdd("xp",x);raiseFloor();save();const r={b,a:ri()};if(!defer)announce(r);return r}
 function announce(r){if(r.a>r.b){if(r.a==6&&!S.sec)secretSeq();else banner("Rank up","Rank "+R[r.a],"You reached rank "+R[r.a]+". Challenges are now harder.")}}

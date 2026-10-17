@@ -21,7 +21,7 @@ function sanitize(o){
   const c=cleanGate(o.co);if(c&&DATE.test(o.co.w)){c.w=o.co.w;s.co=c}
   if(isObj(o.win)){if(HM.test(o.win.s))s.win.s=o.win.s;if(HM.test(o.win.e))s.win.e=o.win.e;s.win.len=int(o.win.len,1,2,2)}
   if(isObj(o.hist))for(const k of Object.keys(o.hist)){const r=o.hist[k];if(DATE.test(k)&&isObj(r))s.hist[k]={c:int(r.c,0,7,0),xp:num(r.xp,0,1e7,0),xl:num(r.xl,0,1e7,0),v:num(r.v,0,1e7,0),st:int(r.st,0,1e5,0),g:int(r.g,0,2,0),bp:[0,1,2,3].map(i=>int(Array.isArray(r.bp)?r.bp[i]:0,0,1e4,0))}}
-  if(isObj(o.pend)&&typeof o.pend.n==='number'&&isFinite(o.pend.n))s.pend={n:num(o.pend.n,0,1e4,0),m:int(o.pend.m,1,1e4,1)};
+  if(isObj(o.pend)&&typeof o.pend.n==='number'&&isFinite(o.pend.n))s.pend={n:num(o.pend.n,0,1e4,0),m:int(o.pend.m,1,1e4,1),w:typeof o.pend.w==="string"?o.pend.w.slice(0,80):""};
   if(Array.isArray(o.keys))for(const k of o.keys.slice(0,20)){if(isObj(k)){const r=int(k.r,0,6,-1),sd=int(k.s,0,36**6-1,-1);if(r>=0&&sd>=0&&!s.keys.some(x=>x.r===r&&x.s===sd))s.keys.push({id:keyCode({r,s:sd}),r,s:sd})}}
   if(isObj(o.sg)){const g=o.sg,r=int(g.r,0,6,-1),sd=int(g.s,0,36**6-1,-1);
     if(r>=0&&sd>=0&&Array.isArray(g.ex)&&g.ex.length===3&&g.ex.every(x=>EX[x])&&Array.isArray(g.t)&&Array.isArray(g.p))

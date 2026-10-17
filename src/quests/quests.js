@@ -23,7 +23,14 @@ function questPanel(col,e){
   const pk=col?"p2":"p",dk=col?"done2":"done",qs=quests(today(),col);
   return `<div class="w"><h2>Daily quest${col?" 2":""}</h2><div class="mu">Choose one. Harder quests pay more. Skipping a day costs XP.</div>${qs.map((q,i)=>`<div class="qr"><button class="q ${e[pk]===i?"sel":""}" onclick="pick(${i},${col})" ${e[dk]?"disabled":""}><b>${qLabel(q)}</b><span class="mu">${qParts(q)} · ${TN[q.t]} · </span><span class="xp">+${q.xp} XP</span></button>${exInfoBtn(q.ex+(q.ex2?","+q.ex2:""))}</div>`).join("")}<button id="fin${col||""}" class="go q" style="text-align:center" onclick="finish(${col})" ${e[pk]==null||e[dk]?"disabled":""}>${e[dk]?"Quest cleared":"Mark quest complete"}</button></div>`;
 }
-const dailyHtml=e=>paused()?pauseHtml():cols()>1?`<div class="cols">${questPanel(0,e)}${questPanel(1,e)}</div>`:questPanel(0,e);
+// Plain status of today: what still has to be done for the day to count.
+function dayStatusHtml(e){
+  if(!e||(e.p==null&&e.p2==null&&!e.done&&!e.done2))return"";
+  const need=[];if(!e.done)need.push("the quest");if(cols()>1&&e.c2!==false&&!e.done2)need.push("the second quest");
+  if((e.done?e.hb:!!habit())&&!e.h)need.push("the weekly habit");
+  return need.length?`<div class="mu" style="margin:0 4px 4px"><b>Day not cleared yet.</b> Still needed: ${need.join(", ")}.</div>`:`<div class="mu" style="margin:0 4px 4px"><b style="color:var(--ok)">Day cleared.</b></div>`;
+}
+const dailyHtml=e=>paused()?pauseHtml():dayStatusHtml(e)+(cols()>1?`<div class="cols">${questPanel(0,e)}${questPanel(1,e)}</div>`:questPanel(0,e));
 const MSG=[["Streak held. Easy quest logged.","Easy quest logged. The streak continues.","Minimum met. Streak intact.","Logged. Showing up counts."],["Medium quest cleared. Progress recorded.","Steady output. Rank progress continues.","Acceptable effort. Continue.","Medium quest logged. Consistency noted."],["Hard quest cleared. Output exceeds baseline.","Strong output. Logged.","Threshold exceeded. Recorded.","Hard quest cleared. Noted."]];
 // Habit for week w, built from the quests chosen in the week before it.
 function habit(w=weekId()){const pw=new Date(w+"T12:00:00");pw.setDate(pw.getDate()-7);const c=[0,0,0,0],a=[0,0,0,0],n=[0,0,0,0];for(let i=0;i<7;i++){const k=ds(pw),e=S.days[k];if(e&&e.done&&e.p!=null){const q=quests(k)[e.p];if(q){c[q.p]++;if(q.t==1&&q.ex===PT[q.p].x){a[q.p]+=q.amt;n[q.p]++}}}pw.setDate(pw.getDate()+1)}const p=c.indexOf(Math.max(...c));return c[p]>=3?{p,amt:Math.max(5,n[p]?Math.round(a[p]/n[p]):Math.round(EX[PT[p].x].med[0]*scale()))}:null}

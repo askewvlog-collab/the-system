@@ -1,7 +1,7 @@
 // Service worker: makes the app work offline. Network first (so updates arrive as soon as you are online),
 // falling back to the cached copy. The version tag below is stamped by build.py from the app content, so every
 // new build replaces the old cache. Nothing here sends your data anywhere.
-const CACHE = "system-4f8d408294";
+const CACHE = "system-fa96b5c2a2";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });

@@ -73,6 +73,11 @@ test("special: abandoning returns the key, loses progress, no penalty, daily que
 test("special: a cleared special gate cannot be abandoned",()=>{fresh(500);addKey({r:3,s:1});openSpecial("SK3-1",{dataset:{c:1}});for(let i=0;i<3;i++)sgAdd(i,9999);sgBail({dataset:{c:1}});ok(S.sg&&S.sg.done)});
 test("special: only one at a time",()=>{fresh(500);addKey({r:2,s:5});addKey({r:3,s:6});openSpecial("SK2-5",{dataset:{c:1}});openSpecial("SK3-6",{dataset:{c:1}});eq(S.keys.length,1)});
 
+// ---- day status and miss reasons
+test("status: one quest done with two columns says the second is still needed; the penalty names why",async()=>{fresh(500);S.stars=[{plus:false}];S.chk=today();const i=quests(today()).findIndex(q=>q.t==0);pick(i);finish(0);await wait(700);render();ok(/Day not cleared yet/.test($("today").textContent)&&/second quest/.test($("today").textContent));S.off=1;penalty();ok(/second was not/.test($("om").textContent),$("om").textContent);$("ov").classList.remove("on");eq(500-S.xp>0,true)});
+test("status: pending habit is named in the reason",()=>{fresh(500);const k=daysAgo(1);S.days[k]={p:0,done:true,hb:true};eq(missReason(k),"the quest was cleared but the weekly habit was not");eq(missReason(daysAgo(2)),"no quest was cleared");S.days[k]={p:0,done:true};eq(missReason(k),"")});
+test("status: a single-column cleared day shows Day cleared and costs nothing",async()=>{fresh(500);S.chk=today();const i=quests(today()).findIndex(q=>q.t==0);pick(i);finish(0);await wait(700);render();ok(/Day cleared/.test($("today").textContent));S.off=1;penalty();eq(S.xp,501)});
+
 // ---- medical pause
 test("pause: ten paused days cost nothing and hold the streak",()=>{fresh(500);const y=daysAgo(1);clearDay(y);S.chk=daysAgo(10);S.pause={t:nowMs()-10*864e5};penalty();eq(S.xp,500);ok(S.days[daysAgo(5)].med&&S.days[daysAgo(5)].rest);ok(streak()>=1)});
 test("pause: no quests, new gate blocked, banner text",()=>{fresh(500);S.pause={t:nowMs()};pauseMark();render();ok(/Medical pause/.test($("today").textContent));ok(!$("today").querySelector(".q"));eq(gateState(),"paused");openGate();ok(!gateFor(weekId()).start)});
