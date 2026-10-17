@@ -5,7 +5,7 @@ const starsText=()=>S.stars.map(s=>s.plus?"★+":"★").join(" ");
 function prestigeHtml(r){
   if(r<6)return"";
   const first=!S.stars.some(s=>!s.plus);
-  return `<div class="w v"><h2>Prestige</h2><div class="mu">Reset to rank EE and gain a permanent star. Special keys are kept.${S.plus?" You hold S+: this star is gold with a plus marker and gives no benefit.":first?" Your first star adds a second daily-quest column. Further stars are cosmetic.":" Further stars are cosmetic."}</div><button style="margin-top:8px" onclick="prestige(this)">Prestige</button></div>`;
+  return `<div class="w v"><h2>Prestige</h2><div class="mu">Reset to rank EE and gain a permanent star. Special keys are kept.${S.plus?" You hold S+: this star is gold with a plus marker and gives no benefit.":first?" Your first star adds an optional second daily quest for bonus XP. Further stars are cosmetic.":" Further stars are cosmetic."}</div><button style="margin-top:8px" onclick="prestige(this)">Prestige</button></div>`;
 }
 function prestige(b){
   if(ri()<6)return;

@@ -13,32 +13,38 @@ function quests(date,col=0){
 }
 const qLabel=q=>q.amt+" "+EX[q.ex].nm+(q.ex2?" + "+q.amt2+" "+EX[q.ex2].nm:"");
 const qParts=q=>PT[q.p].n+(q.ex2?" + "+PT[q.p2].n:"");
-// A first star (not S+) adds a second daily-quest column; when it was active that day, both must be cleared (e.c2).
+// A first star (not S+) adds a second daily quest. It is an optional extra for bonus XP; only the first quest (and the weekly habit, unless declined) clears the day.
 const cols=()=>S.stars.some(s=>!s.plus)?2:1;
-function dayDone(d){const e=S.days[d];return !!e&&(e.sg===true||!!(e.done&&(!e.hb||e.h)&&(!e.c2||e.done2)))}
+function dayDone(d){const e=S.days[d];return !!e&&(e.sg===true||!!(e.done&&(!e.hb||e.h||e.hd)))}
 function weekDone(w){let n=0,d=new Date(w+"T12:00:00");for(let i=0;i<7;i++){if(dayDone(ds(d)))n++;d.setDate(d.getDate()+1)}return n}
 function pick(i,col=0){const d=today();const e=S.days[d]||(S.days[d]={});if(e[col?"done2":"done"]||e.rest)return;if(col)e.p2=i;else e.p=i;if(cols()>1)e.c2=true;save();render()}
 function finish(col=0){const d=today(),e=S.days[d],pk=col?"p2":"p",dk=col?"done2":"done";if(!e||e[pk]==null||e[dk]||e.rest)return;const q=quests(d,col)[e[pk]];e[dk]=true;if(!col)e.hb=!!habit();histClear(q);zap($(col?"fin2":"fin"));const res=gain(q.xp,true);render();setTimeout(()=>{announce(res);const M=MSG[q.t];toast(M[Math.floor(Math.random()*M.length)])},650)}
 function questPanel(col,e){
   const pk=col?"p2":"p",dk=col?"done2":"done",qs=quests(today(),col);
-  return `<div class="w"><h2>Daily quest${col?" 2":""}</h2><div class="mu">Choose one. Harder quests pay more. Skipping a day costs XP.</div>${qs.map((q,i)=>`<div class="qr"><button class="q ${e[pk]===i?"sel":""}" onclick="pick(${i},${col})" ${e[dk]?"disabled":""}><b>${qLabel(q)}</b><span class="mu">${qParts(q)} · ${TN[q.t]} · </span><span class="xp">+${q.xp} XP</span></button>${exInfoBtn(q.ex+(q.ex2?","+q.ex2:""))}</div>`).join("")}<button id="fin${col||""}" class="go q" style="text-align:center" onclick="finish(${col})" ${e[pk]==null||e[dk]?"disabled":""}>${e[dk]?"Quest cleared":"Mark quest complete"}</button></div>`;
+  return `<div class="w"><h2>Daily quest${col?" 2 (optional)":""}</h2><div class="mu">${col?"Optional extra for bonus XP. It does not affect your day.":"Choose one. Harder quests pay more. Skipping a day costs XP."}</div>${qs.map((q,i)=>`<div class="qr"><button class="q ${e[pk]===i?"sel":""}" onclick="pick(${i},${col})" ${e[dk]?"disabled":""}><b>${qLabel(q)}</b><span class="mu">${qParts(q)} · ${TN[q.t]} · </span><span class="xp">+${q.xp} XP</span></button>${exInfoBtn(q.ex+(q.ex2?","+q.ex2:""))}</div>`).join("")}<button id="fin${col||""}" class="go q" style="text-align:center" onclick="finish(${col})" ${e[pk]==null||e[dk]?"disabled":""}>${e[dk]?"Quest cleared":"Mark quest complete"}</button></div>`;
 }
 // Plain status of today: what still has to be done for the day to count.
 function dayStatusHtml(e){
   if(!e||(e.p==null&&e.p2==null&&!e.done&&!e.done2))return"";
-  const need=[];if(!e.done)need.push("the quest");if(cols()>1&&e.c2!==false&&!e.done2)need.push("the second quest");
-  if((e.done?e.hb:!!habit())&&!e.h)need.push("the weekly habit");
+  const need=[];if(!e.done)need.push("the quest");
+  if((e.done?e.hb:!!habit())&&!e.h&&!e.hd)need.push("the weekly habit");
   return need.length?`<div class="mu" style="margin:0 4px 4px"><b>Day not cleared yet.</b> Still needed: ${need.join(", ")}.</div>`:`<div class="mu" style="margin:0 4px 4px"><b style="color:var(--ok)">Day cleared.</b></div>`;
 }
 const dailyHtml=e=>paused()?pauseHtml():dayStatusHtml(e)+(cols()>1?`<div class="cols">${questPanel(0,e)}${questPanel(1,e)}</div>`:questPanel(0,e));
 const MSG=[["Streak held. Easy quest logged.","Easy quest logged. The streak continues.","Minimum met. Streak intact.","Logged. Showing up counts."],["Medium quest cleared. Progress recorded.","Steady output. Rank progress continues.","Acceptable effort. Continue.","Medium quest logged. Consistency noted."],["Hard quest cleared. Output exceeds baseline.","Strong output. Logged.","Threshold exceeded. Recorded.","Hard quest cleared. Noted."]];
 // Habit for week w, built from the quests chosen in the week before it.
 function habit(w=weekId()){const pw=new Date(w+"T12:00:00");pw.setDate(pw.getDate()-7);const c=[0,0,0,0],a=[0,0,0,0],n=[0,0,0,0];for(let i=0;i<7;i++){const k=ds(pw),e=S.days[k];if(e&&e.done&&e.p!=null){const q=quests(k)[e.p];if(q){c[q.p]++;if(q.t==1&&q.ex===PT[q.p].x){a[q.p]+=q.amt;n[q.p]++}}}pw.setDate(pw.getDate()+1)}const p=c.indexOf(Math.max(...c));return c[p]>=3?{p,amt:Math.max(5,n[p]?Math.round(a[p]/n[p]):Math.round(EX[PT[p].x].med[0]*scale()))}:null}
-function habitDone(){const d=today(),e=S.days[d]||(S.days[d]={});if(e.h)return;e.h=true;histSync();zap($("hb"));const res=gain(habitXp(),true);render();setTimeout(()=>{announce(res);toast("Habit done. Consistency wins.")},650)}
+// Decline today's habit: lose some XP (the habit's own XP value, never below the rank floor) and the day still counts.
+function habitDecline(b){
+  const d=today(),e=S.days[d]||(S.days[d]={});if(e.h||e.hd||e.rest)return;
+  if(!b.dataset.c){b.dataset.c="1";b.textContent="Tap again: lose "+habitXp()+" XP and skip today's habit";setTimeout(()=>{b.dataset.c="";b.textContent="Decline habit"},4000);return}
+  e.hd=true;const lost=loseXp(habitXp());if(lost)histAdd("xl",lost);histSync();save();render();toast(lost?"Habit declined. −"+lost+" XP.":"Habit declined.");
+}
+function habitDone(){const d=today(),e=S.days[d]||(S.days[d]={});if(e.h||e.hd)return;e.h=true;histSync();zap($("hb"));const res=gain(habitXp(),true);render();setTimeout(()=>{announce(res);toast("Habit done. Consistency wins.")},650)}
 const nextWeekId=()=>ds(new Date(new Date(weekId()+"T12:00:00").getTime()+7*864e5));
 function habitHtml(e){
   const h=habit(),P=h&&PT[h.p];
-  let out=h?`<div class="w v"><h2>Weekly habit</h2><div class="mu">You picked ${P.n} most last week. Do this every day on top of your quest. Missing either one costs the day. Reward <span class="xp">+${habitXp()} XP</span>.</div><p><b style="font-size:18px">${h.amt} ${P.e}</b> ${exInfoBtn(P.x)}</p><button id="hb" class="${e.h?"":"go"}" onclick="habitDone()" ${e.h?"disabled":""}>${e.h?"Habit done":"Mark habit complete"}</button></div>`:"";
+  let out=h?`<div class="w v"><h2>Weekly habit</h2><div class="mu">You picked ${P.n} most last week. Do this every day on top of your quest. Missing either one costs the day, unless you decline the habit and lose some XP. Reward <span class="xp">+${habitXp()} XP</span>.</div><p><b style="font-size:18px">${h.amt} ${P.e}</b> ${exInfoBtn(P.x)}</p><button id="hb" class="${e.h?"":"go"}" onclick="habitDone()" ${e.h||e.hd?"disabled":""}>${e.h?"Habit done":e.hd?"Habit declined":"Mark habit complete"}</button>${e.h||e.hd?"":` <button onclick="habitDecline(this)">Decline habit</button>`}</div>`:"";
   if(now().getDay()===0){const n=habit(nextWeekId()),N=n&&PT[n.p];out+=`<div class="w"><h2>Next week's habit</h2><div class="mu">${n?`Preview: <b>${n.amt} ${N.e}</b> every day. Based on the quests you chose this week. Clearing another quest today may change it.`:"None yet. A body part chosen on 3 or more days becomes next week's daily habit."}</div></div>`}
   return out}
 function restHtml(e){const t=S.tok||0;if(e.rest)return `<div class="w v"><h2>Rest day</h2><div class="mu">Streak protected. No XP lost. This day does not count toward your 5 days.</div></div>`;return `<div class="w"><h2 id="rt">Rest tokens: ${t} / 2</h2><div class="mu">Earned by clearing gates. A rest day keeps your streak and costs no XP, but does not count toward your 5 days.</div>${t>0&&!e.done?`<button style="margin-top:8px" onclick="useRest()">Use rest token</button>`:""}</div>`}

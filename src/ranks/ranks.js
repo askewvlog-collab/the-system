@@ -21,7 +21,7 @@ function penalty(){
   save();
 }
 // Why a day did not count, in plain words.
-function missReason(k){const e=S.days[k];if(!e||!(e.done||e.sg))return"no quest was cleared";if(e.hb&&!e.h)return"the quest was cleared but the weekly habit was not";if(e.c2&&!e.done2)return"the first quest was cleared but the second was not";return""}
+function missReason(k){const e=S.days[k];if(!e||!(e.done||e.sg))return"no quest was cleared";if(e.hb&&!e.h&&!e.hd)return"the quest was cleared but the weekly habit was not";return""}
 function applyPenalty(n,missed,why){const lost=loseXp(n);if(!lost)return;histAdd("xl",lost);save();banner("Penalty","−"+lost+" XP",missed>1?"You were absent "+missed+" days. One penalty applied.":why&&missed==1?"Day not cleared: "+why+". Quests cost XP when skipped.":"You missed a day. Quests cost XP when skipped.")}
 // Return after missed days with a token in hand: spend it to lose no XP, or lose the XP and keep the token.
 function pendShow(){const p=S.pend;if(!p)return;const loss=Math.max(0,Math.min(p.n,S.xp-T[floorIdx()]));$("pnm").textContent=(p.m>1?"You were absent "+p.m+" days. ":p.w?"Day not cleared: "+p.w+". ":"You missed a day. ")+"One penalty applies: −"+loss+" XP. Spend a rest token (you have "+(S.tok||0)+") to lose nothing, or accept the loss and keep the token.";$("pn").classList.add("on")}

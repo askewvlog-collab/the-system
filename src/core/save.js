@@ -16,7 +16,7 @@ function cleanGate(g){
 function sanitize(o){
   const s=def();s.xp=num(o.xp,0,1e7,0);s.fl=int(o.fl,0,5,0);s.chk=DATE.test(o.chk)?o.chk:null;
   if(isObj(o.days))for(const k of Object.keys(o.days)){const e=o.days[k];if(DATE.test(k)&&isObj(e)){const d={};
-    if(e.p!=null)d.p=int(e.p,0,2,undefined);if(e.p2!=null)d.p2=int(e.p2,0,2,undefined);for(const f of["done","hb","h","rest","sg","c2","done2","med"])if(e[f]===true)d[f]=true;s.days[k]=d}}
+    if(e.p!=null)d.p=int(e.p,0,2,undefined);if(e.p2!=null)d.p2=int(e.p2,0,2,undefined);for(const f of["done","hb","h","rest","sg","c2","done2","med","hd"])if(e[f]===true)d[f]=true;s.days[k]=d}}
   if(isObj(o.gates))for(const k of Object.keys(o.gates)){const g=cleanGate(o.gates[k]);if(DATE.test(k)&&g)s.gates[k]=g}
   const c=cleanGate(o.co);if(c&&DATE.test(o.co.w)){c.w=o.co.w;s.co=c}
   if(isObj(o.win)){if(HM.test(o.win.s))s.win.s=o.win.s;if(HM.test(o.win.e))s.win.e=o.win.e;s.win.len=int(o.win.len,1,2,2)}
